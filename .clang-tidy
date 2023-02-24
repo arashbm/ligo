@@ -1,0 +1,23 @@
+---
+Checks: "*,
+        -abseil-*,
+        -altera-*,
+        -android-*,
+        -fuchsia-*,
+        -google-*,
+        -llvm*,
+        -modernize-use-trailing-return-type,
+        -zircon-*,
+        -readability-else-after-return,
+        -readability-static-accessed-through-instance,
+        -readability-avoid-const-params-in-decls,
+        -readability-braces-around-statements
+        -hicpp-braces-around-statements
+        -hicpp-signed-bitwise
+        -readability-convert-member-functions-to-static
+        -cppcoreguidelines-macro-usage
+        -bugprone-macro-parentheses
+"
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+FormatStyle: none

@@ -1,0 +1,62 @@
+#ifndef INCLUDE_LIGO_IMPL_PYTHON_TYPES_TPP_
+#define INCLUDE_LIGO_IMPL_PYTHON_TYPES_TPP_
+
+#include <fmt/format.h>
+
+#include "../python_types.hpp"
+
+namespace ligo {
+  template <typename T>
+  python_type<T>::python_type(const std::string& name, const std::string& docs)
+      : _name{name}, _docs{docs} {};
+
+  template <typename T>
+  void python_type<T>::add_overload_set(const overload_set& set) {
+    _overload_sets.emplace(set.name(), set);
+  }
+
+  template <typename T>
+  std::string python_type<T>::name() const {
+    return _name;
+  }
+
+  template <typename T>
+  std::string python_type<T>::docs() const {
+    return _docs;
+  }
+
+  template <typename T>
+  std::unordered_map<std::string, overload_set>
+  python_type<T>::overload_sets() const {
+    return _overload_sets;
+  }
+
+  template <typename T>
+  final_python_type::final_python_type(
+        const python_type<T>& t, const std::string& m_name) :
+      _name{t.name()},
+      _full_name{fmt::format("{}.{}", m_name, _name)},
+      _docs{t.docs()} {
+    PyType_Slot slots[] = {
+      {Py_tp_doc, (void*)PyDoc_STR(_docs.c_str())},
+      {Py_tp_init, (void*)(initproc)default_init},
+      {Py_tp_new, (void*)PyType_GenericNew},
+      {0, nullptr},
+    };
+
+    PyType_Spec specs{
+      .name = _full_name.c_str(),
+      .basicsize = sizeof(pod<T>),
+      .itemsize = 0,
+      .flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE,
+      .slots = slots
+    };
+
+    _type_object = PyType_FromSpec(&specs);
+
+    for (auto& [name, os]: t.overload_sets())
+      _overload_sets.push_back(os);
+  };
+}
+
+#endif  // INCLUDE_LIGO_IMPL_PYTHON_TYPES_TPP_
