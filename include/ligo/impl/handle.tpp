@@ -8,16 +8,16 @@
 
 namespace ligo {
   template <typename T>
-  handle<T>::handle(PyObject* o, python_module& m) : _o{o}, _m{m} {}
+  handle<T>::handle(PyObject* obj, python_module& mod) : _obj{obj}, _mod{mod} {}
 
   template <typename T>
   std::optional<handle<T>>
-  handle<T>::from_cpp(const T& value, python_module& m) {
-    if (auto ft = m.final_type(typeid(T))) {
-      if (auto o = PyType_GenericAlloc(
+  handle<T>::from_cpp(const T& value, python_module& mod) {
+    if (auto ft = mod.final_type(typeid(T))) {
+      if (auto* obj = PyType_GenericAlloc(
             (PyTypeObject*)ft->get().type_object(), 0)) {
-        std::bit_cast<pod<T>*>(o)->value = value;
-        return handle<T>(o, m);
+        std::bit_cast<pod<T>*>(obj)->value = value;
+        return handle<T>(obj, mod);
       }
     }
 
@@ -26,10 +26,10 @@ namespace ligo {
 
   template <typename T>
   std::optional<handle<T>>
-  handle<T>::from_python(PyObject* o, python_module& m) {
-    if (auto ft = m.final_type(typeid(T)))
-      if (PyObject_TypeCheck(o, (PyTypeObject*)ft->get().type_object()))
-        return handle<T>(o, m);
+  handle<T>::from_python(PyObject* obj, python_module& mod) {
+    if (auto ft = mod.final_type(typeid(T)))
+      if (PyObject_TypeCheck(obj, (PyTypeObject*)ft->get().type_object()))
+        return handle<T>(obj, mod);
 
     return {};
   }
@@ -37,17 +37,17 @@ namespace ligo {
   template <typename T>
   std::optional<handle<T>>
   handle<T>::from_python_with_casting(
-      PyObject* o, python_module& m, temporary_list& temp_list) {
-    if (auto ft = m.final_type(typeid(T))) {
+      PyObject* obj, python_module& mod, temporary_list& temp_list) {
+    if (auto ft = mod.final_type(typeid(T))) {
       PyTypeObject* type_object = (PyTypeObject*)ft->get().type_object();
-      if (PyObject_TypeCheck(o, type_object)) {
-        return handle<T>(o, m);
+      if (PyObject_TypeCheck(obj, type_object)) {
+        return handle<T>(obj, mod);
       } else if (auto init = ft->get().initialiser()) {
-        auto cast_object = PyType_GenericAlloc(type_object, 0);
+        auto* cast_object = PyType_GenericAlloc(type_object, 0);
         if (cast_object) {
-          PyObject* args[] = {cast_object, o};
-          if (init->get().internal_call(args, 2, m, true)) {
-            return handle<T>(cast_object, m);
+          PyObject* args[] = {cast_object, obj};
+          if (init->get().internal_call(args, 2, mod, true)) {
+            return handle<T>(cast_object, mod);
           } else {
             Py_DECREF(cast_object);
             PyErr_Clear();
@@ -60,14 +60,14 @@ namespace ligo {
   }
 
   template <typename T>
-  handle<T>::operator T*() { return &std::bit_cast<pod<T>*>(_o)->value; }
+  handle<T>::operator T*() { return &std::bit_cast<pod<T>*>(_obj)->value; }
   template <typename T>
-  handle<T>::operator T() const { return std::bit_cast<pod<T>*>(_o)->value; }
+  handle<T>::operator T() const { return std::bit_cast<pod<T>*>(_obj)->value; }
   template <typename T>
-  handle<T>::operator T&() { return std::bit_cast<pod<T>*>(_o)->value; }
+  handle<T>::operator T&() { return std::bit_cast<pod<T>*>(_obj)->value; }
 
   template <typename T>
-  PyObject* handle<T>::object() { return _o; }
+  PyObject* handle<T>::object() { return _obj; }
 }
 
 #endif  // INCLUDE_LIGO_IMPL_HANDLE_TPP_

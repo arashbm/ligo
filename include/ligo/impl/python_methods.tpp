@@ -86,13 +86,13 @@ namespace ligo {
           handle<std::remove_cvref_t<Args>>::from_python_with_casting(
             std::get<Ns>(a), m, temp_list)...);
       if ((std::get<Ns>(t) && ...))
-        return {{std::get<Ns>(t).value()...}};
+        return {{static_cast<Args>(std::get<Ns>(t).value())...}};
     } else {
       std::tuple t(
           handle<std::remove_cvref_t<Args>>::from_python(
             std::get<Ns>(a), m)...);
       if ((std::get<Ns>(t) && ...))
-        return {{std::get<Ns>(t).value()...}};
+        return {{static_cast<Args>(std::get<Ns>(t).value())...}};
     }
 
     return {};
