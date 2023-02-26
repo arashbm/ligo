@@ -5,41 +5,41 @@ static ligo::python_module mod("libtest_concrete_objects",
 
 PyMODINIT_FUNC PyInit_libtest_concrete_objects() {
   ligo::overload_set none_arg("none_arg");
-  none_arg.add_overload([](ligo::python_none& a) { Py_RETURN_TRUE; }, {"a"});
+  none_arg.add_overload([](ligo::python_none& /* param */) { Py_RETURN_TRUE; }, {"a"});
   none_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
   mod.add_overload_set(none_arg);
 
 
   ligo::overload_set bool_arg("bool_arg");
   bool_arg.add_overload(
-      [](ligo::python_bool& a) { Py_RETURN_TRUE; }, {"a"});
+      [](ligo::python_bool& /* param */) { Py_RETURN_TRUE; }, {"a"});
   bool_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
   mod.add_overload_set(bool_arg);
 
 
   ligo::overload_set long_arg("long_arg");
   long_arg.add_overload(
-      [](ligo::python_long& a) { Py_RETURN_TRUE; }, {"a"});
+      [](ligo::python_long& /* param */) { Py_RETURN_TRUE; }, {"a"});
   long_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
   mod.add_overload_set(long_arg);
 
 
   ligo::overload_set float_arg("float_arg");
   float_arg.add_overload(
-      [](ligo::python_float& a) { Py_RETURN_TRUE; }, {"a"});
+      [](ligo::python_float& /* param */) { Py_RETURN_TRUE; }, {"a"});
   float_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
   mod.add_overload_set(float_arg);
 
 
   ligo::overload_set complex_arg("complex_arg");
   complex_arg.add_overload(
-      [](ligo::python_complex& a) { Py_RETURN_TRUE; }, {"a"});
+      [](ligo::python_complex& /* param */) { Py_RETURN_TRUE; }, {"a"});
   complex_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
   mod.add_overload_set(complex_arg);
 
 
   ligo::overload_set unicode_arg("unicode_arg");
-  unicode_arg.add_overload([](ligo::python_unicode& a) {
+  unicode_arg.add_overload([](ligo::python_unicode& /* param */) {
       Py_RETURN_TRUE;
     }, {"a"});
   unicode_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
@@ -47,7 +47,7 @@ PyMODINIT_FUNC PyInit_libtest_concrete_objects() {
 
 
   ligo::overload_set tuple_arg("tuple_arg");
-  tuple_arg.add_overload([](ligo::python_tuple& a) {
+  tuple_arg.add_overload([](ligo::python_tuple& /* param */) {
       Py_RETURN_TRUE;
     }, {"a"});
   tuple_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
@@ -55,7 +55,7 @@ PyMODINIT_FUNC PyInit_libtest_concrete_objects() {
 
 
   ligo::overload_set list_arg("list_arg");
-  list_arg.add_overload([](ligo::python_list& a) {
+  list_arg.add_overload([](ligo::python_list& /* param */) {
       Py_RETURN_TRUE;
     }, {"a"});
   list_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
@@ -63,7 +63,7 @@ PyMODINIT_FUNC PyInit_libtest_concrete_objects() {
 
 
   ligo::overload_set dictionary_arg("dictionary_arg");
-  dictionary_arg.add_overload([](ligo::python_dictionary& a) {
+  dictionary_arg.add_overload([](ligo::python_dictionary& /* param */) {
       Py_RETURN_TRUE;
     }, {"a"});
   dictionary_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
@@ -71,7 +71,7 @@ PyMODINIT_FUNC PyInit_libtest_concrete_objects() {
 
 
   ligo::overload_set set_arg("set_arg");
-  set_arg.add_overload([](ligo::python_set& a) {
+  set_arg.add_overload([](ligo::python_set& /* param */) {
       Py_RETURN_TRUE;
     }, {"a"});
   set_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});

@@ -40,10 +40,10 @@ namespace ligo {
   class final_python_type {
   public:
     template <typename T>
-    final_python_type(const python_type<T>& t, const std::string& m_name);
+    final_python_type(const python_type<T>& ptype, const std::string& m_name);
 
-    std::string name() const;
-    std::string docs() const;
+    [[nodiscard]] std::string name() const;
+    [[nodiscard]] std::string docs() const;
     PyObject* type_object();
     bool init(PyObject* module_instance, python_module& mod);
     std::optional<std::reference_wrapper<overload_set>> initialiser();

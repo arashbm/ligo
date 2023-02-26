@@ -10,7 +10,7 @@ PyObject* test_python_exception() {
 }
 
 PyObject* test_throw_object() {
-  throw 13;
+  throw 13;  // NOLINT
   Py_RETURN_TRUE;
 }
 
@@ -56,7 +56,7 @@ PyObject* test_exception() {
 
 class hello_exception : public std::exception {
 public:
-  virtual char const* what() const noexcept {
+  [[nodiscard]] const char* what() const noexcept override {
     return "threw hello_exception";
   }
 };
@@ -105,9 +105,9 @@ PyMODINIT_FUNC PyInit_libtest_exceptions() {
   toe.add_overload(&test_overflow_error, {});
   mod.add_overload_set(toe);
 
-  ligo::overload_set te("test_exception");
-  te.add_overload(&test_exception, {});
-  mod.add_overload_set(te);
+  ligo::overload_set tef("test_exception");
+  tef.add_overload(&test_exception, {});
+  mod.add_overload_set(tef);
 
   ligo::overload_set tes("test_exception_subclass");
   tes.add_overload(&test_exception_subclass, {});

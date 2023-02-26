@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 #include <stdexcept>
+#include <unordered_map>
 
 #include "metal.hpp"
 
@@ -21,7 +22,7 @@ namespace ligo {
 
   struct python_exception : public std::runtime_error {
     python_exception();
-    python_exception(const char* what);
+    explicit python_exception(const char* what);
   };
 
   class overload_set {
@@ -29,14 +30,14 @@ namespace ligo {
     using wrapped_function = std::optional<PyObject*>(
         PyObject* const*, std::size_t, PyObject*, python_module&, bool);
 
-    overload_set(const std::string& name);
+    explicit overload_set(const std::string& name);
 
     template<typename F>
-    void add_overload(F&& f,
+    void add_overload(F&& func,
       std::array<std::string, function_traits<F>::arity> keywords);
 
     template<typename F>
-    void add_implicit_overload(F&& f,
+    void add_implicit_overload(F&& func,
       std::array<std::string, function_traits<F>::arity> keywords);
 
     PyObject* operator()(PyObject* const* args,
@@ -45,12 +46,12 @@ namespace ligo {
     std::optional<PyObject*> internal_call(PyObject* const* args,
         std::size_t nargs, python_module& mod, bool already_casting);
 
-    std::string name() const;
+    [[nodiscard]] std::string name() const;
   private:
     template<typename F>
     void _wrap_and_add(
-        F&& f,
-        std::array<std::string, function_traits<F>::arity> keywords,
+        F&& func,
+        const std::array<std::string, function_traits<F>::arity>& keywords,
         bool implicit);
     std::string _name;
     bool _is_operator;
@@ -112,6 +113,8 @@ namespace ligo {
     .tp_doc = PyDoc_STR("bound method callable"),
     .tp_new = PyType_GenericNew,
   };
+
+  void set_error_based_on_exception(const std::exception_ptr& exception);
 }
 
 #endif  // INCLUDE_LIGO_PYTHON_METHODS_HPP_

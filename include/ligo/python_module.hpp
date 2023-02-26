@@ -18,17 +18,17 @@ namespace ligo {
 
   class python_module {
   public:
-    python_module(const std::string& name, const std::string& docs);
+    python_module(const std::string& name, const std::string& docs) noexcept;
 
     template <typename T>
-    void add_type(const python_type<T>& t);
-    void add_overload_set(const overload_set& os);
+    void add_type(const python_type<T>& ptype);
+    void add_overload_set(const overload_set& set);
 
     std::optional<std::reference_wrapper<final_python_type>>
-    final_type(const std::type_index& t);
+    final_type(const std::type_index& type_idx);
 
-    std::string name() const;
-    std::string docs() const;
+    [[nodiscard]] std::string name() const;
+    [[nodiscard]] std::string docs() const;
     PyObject* init();
   private:
     std::unordered_map<std::type_index, final_python_type> _types;

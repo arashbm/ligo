@@ -7,16 +7,16 @@ namespace ligo {
   template <typename... Args>
   struct resolve_t {
       template <typename R, bool X>
-      constexpr auto operator()(R(*pf)(Args...) noexcept(X)) const noexcept
-            -> decltype(pf) {
-          return pf;
+      constexpr auto operator()(R(*func)(Args...) noexcept(X)) const noexcept
+            -> decltype(func) {
+          return func;
       }
 
       template <typename R, class C, bool X>
       constexpr auto
-      operator()(R(C::*pmf)(Args...) noexcept(X)) const noexcept
-            -> decltype(pmf) {
-          return pmf;
+      operator()(R(C::*member_func)(Args...) noexcept(X)) const noexcept
+            -> decltype(member_func) {
+          return member_func;
       }
   };
 

@@ -22,10 +22,13 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(fmt metal)
 
-set(CMAKE_CXX_CLANG_TIDY clang-tidy-15
-  -config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy
-  -header-filter=${CMAKE_CURRENT_SOURCE_DIR}
-  -warnings-as-errors=*)
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_CXX_CLANG_TIDY
+  clang-tidy;
+  --config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy;
+  --header-filter=${CMAKE_CURRENT_SOURCE_DIR}/include;
+  --warnings-as-errors=*;)
 
 add_library(${PROJECT_NAME} STATIC
   src/concrete_objects.cpp

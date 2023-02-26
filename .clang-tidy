@@ -1,5 +1,6 @@
 ---
-Checks: "*,
+Checks: |
+        *,
         -abseil-*,
         -altera-*,
         -android-*,
@@ -11,13 +12,21 @@ Checks: "*,
         -readability-else-after-return,
         -readability-static-accessed-through-instance,
         -readability-avoid-const-params-in-decls,
-        -readability-braces-around-statements
-        -hicpp-braces-around-statements
-        -hicpp-signed-bitwise
-        -readability-convert-member-functions-to-static
-        -cppcoreguidelines-macro-usage
-        -bugprone-macro-parentheses
-"
+        -readability-braces-around-statements,
+        -hicpp-braces-around-statements,
+        -hicpp-signed-bitwise,
+        -hicpp-vararg,
+        -cert-err58-cpp,
+        -readability-convert-member-functions-to-static,
+        -cppcoreguidelines-macro-usage,
+        -cppcoreguidelines-avoid-non-const-global-variables,
+        -cppcoreguidelines-pro-type-cstyle-cast,
+        -cppcoreguidelines-pro-type-vararg,
+        -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+        -bugprone-macro-parentheses,
+        -bugprone-easily-swappable-parameters,
+        -modernize-pass-by-value
+
 WarningsAsErrors: ''
-HeaderFilterRegex: ''
-FormatStyle: none
+
+UseColor: True

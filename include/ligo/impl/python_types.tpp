@@ -1,6 +1,8 @@
 #ifndef INCLUDE_LIGO_IMPL_PYTHON_TYPES_TPP_
 #define INCLUDE_LIGO_IMPL_PYTHON_TYPES_TPP_
 
+#include <array>
+
 #include <fmt/format.h>
 
 #include "../python_types.hpp"
@@ -33,28 +35,28 @@ namespace ligo {
 
   template <typename T>
   final_python_type::final_python_type(
-        const python_type<T>& t, const std::string& m_name) :
-      _name{t.name()},
+        const python_type<T>& ptype, const std::string& m_name) :
+      _name{ptype.name()},
       _full_name{fmt::format("{}.{}", m_name, _name)},
-      _docs{t.docs()} {
-    PyType_Slot slots[] = {
+      _docs{ptype.docs()} {
+    std::array<PyType_Slot, 4> slots{{
       {Py_tp_doc, (void*)PyDoc_STR(_docs.c_str())},
       {Py_tp_init, (void*)(initproc)default_init},
       {Py_tp_new, (void*)PyType_GenericNew},
       {0, nullptr},
-    };
+    }};
 
     PyType_Spec specs{
       .name = _full_name.c_str(),
       .basicsize = sizeof(pod<T>),
       .itemsize = 0,
       .flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE,
-      .slots = slots
+      .slots = slots.data()
     };
 
     _type_object = PyType_FromSpec(&specs);
 
-    for (auto& [name, os]: t.overload_sets())
+    for (auto& [name, os]: ptype.overload_sets())
       _overload_sets.push_back(os);
   };
 }

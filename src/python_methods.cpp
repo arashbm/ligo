@@ -62,18 +62,18 @@ namespace ligo {
 
   PyObject* method_descriptor_get(
       method_descriptor* descr, PyObject* obj, PyObject* /* obj_type */) {
-    if (obj) {
-      auto bm = PyType_GenericAlloc(&bound_method_definition, 0);
-      if (bm == nullptr)
+    if (obj != nullptr) {
+      auto* bmeth = PyType_GenericAlloc(&bound_method_definition, 0);
+      if (bmeth == nullptr)
         return PyErr_NoMemory();
-      std::bit_cast<bound_method*>(bm)->set = descr->set;
-      std::bit_cast<bound_method*>(bm)->mod = descr->mod;
+      std::bit_cast<bound_method*>(bmeth)->set = descr->set;
+      std::bit_cast<bound_method*>(bmeth)->mod = descr->mod;
       Py_INCREF(obj);
-      std::bit_cast<bound_method*>(bm)->obj = obj;
-      std::bit_cast<bound_method*>(bm)->vectorcall =
+      std::bit_cast<bound_method*>(bmeth)->obj = obj;
+      std::bit_cast<bound_method*>(bmeth)->vectorcall =
         (vectorcallfunc)bound_method_vectorcall;
-      Py_INCREF(bm);
-      return bm;
+      Py_INCREF(bmeth);
+      return bmeth;
     } else {
       Py_INCREF((PyObject*)descr);
       return (PyObject*)descr;
@@ -95,21 +95,21 @@ namespace ligo {
     overload_set& set = *(bmethod->set);
     python_module& mod = *(bmethod->mod);
 
-    PyObject* res;
+    PyObject* res = nullptr;
     if (PY_VECTORCALL_ARGUMENTS_OFFSET & nargs) {
-      auto tmp_args = (PyObject**)args - 1;
-      auto original_arg_zero = tmp_args[0];
+      auto* tmp_args = (PyObject**)args - 1;
+      auto* original_arg_zero = tmp_args[0];
       tmp_args[0] = real_self;
       res = set(tmp_args, PyVectorcall_NARGS(nargs) + 1, kwnames, mod);
       tmp_args[0] = original_arg_zero;
     } else {
       std::size_t total_len = PyVectorcall_NARGS(nargs);
-      if (kwnames)
+      if (kwnames != nullptr)
         total_len += static_cast<std::size_t>(PyObject_Length(kwnames));
 
-      PyObject** tmp_args = static_cast<PyObject**>(
+      auto* tmp_args = static_cast<PyObject**>(
           PyObject_Malloc((total_len + 1)*sizeof(PyObject*)));
-      if (!tmp_args)
+      if (tmp_args == nullptr)
         return PyErr_NoMemory();
       tmp_args[0] = real_self;
       for (size_t i{}; i < total_len; i++)
@@ -123,11 +123,10 @@ namespace ligo {
 
   int bound_method_new(
       bound_method* self, PyObject* args, PyObject* kwds) {
-
     PyObject* method_desc = nullptr;
     PyObject* obj = nullptr;
     if (!PyArg_ParseTupleAndKeywords(
-          args, kwds, "O", {nullptr}, &method_desc, &obj))
+          args, kwds, "O", nullptr, &method_desc, &obj))
       return -1;
 
     if (!PyObject_TypeCheck(method_desc, &method_descriptor_definition)) {
@@ -136,17 +135,44 @@ namespace ligo {
       return -1;
     }
 
-    method_descriptor* m = std::bit_cast<method_descriptor*>(method_desc);
+    auto* mdesc = std::bit_cast<method_descriptor*>(method_desc);
 
     PyObject* prev_obj = self->obj;
     Py_INCREF(obj);
     self->obj = obj;
     Py_XDECREF(prev_obj);
 
-    self->set = m->set;
-    self->mod = m->mod;
+    self->set = mdesc->set;
+    self->mod = mdesc->mod;
     self->vectorcall = (vectorcallfunc)bound_method_vectorcall;
 
     return 0;
   }
+
+  void set_error_based_on_exception(const std::exception_ptr& exception) {
+    try {
+      std::rethrow_exception(exception);
+    } catch (const python_exception& e) {
+      // error is already set
+    } catch (const std::bad_alloc& e) {
+      PyErr_Format(PyExc_MemoryError, e.what());
+    } catch (const std::domain_error& e) {
+      PyErr_Format(PyExc_ValueError, e.what());
+    } catch (const std::invalid_argument& e) {
+      PyErr_Format(PyExc_ValueError, e.what());
+    } catch (const std::length_error& e) {
+      PyErr_Format(PyExc_ValueError, e.what());
+    } catch (const std::out_of_range& e) {
+      PyErr_Format(PyExc_IndexError, e.what());
+    } catch (const std::range_error& e) {
+      PyErr_Format(PyExc_ValueError, e.what());
+    } catch (const std::overflow_error& e) {
+      PyErr_Format(PyExc_OverflowError, e.what());
+    } catch (const std::exception& e) {
+      PyErr_Format(PyExc_RuntimeError, e.what());
+    } catch (...) {
+      PyErr_Format(PyExc_RuntimeError, "Unknown exception");
+    }
+  }
+
 }

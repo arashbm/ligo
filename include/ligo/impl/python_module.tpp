@@ -8,11 +8,11 @@
 
 namespace ligo {
   template <typename T>
-  void python_module::add_type(const python_type<T>& t) {
+  void python_module::add_type(const python_type<T>& ptype) {
     _types.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(typeid(T)),
-        std::forward_as_tuple(t, _name));
+        std::forward_as_tuple(ptype, _name));
   }
 }  // namespace ligo
 

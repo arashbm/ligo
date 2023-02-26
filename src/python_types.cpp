@@ -30,23 +30,23 @@ namespace ligo {
     }
 
     // add method descriptors
-    for (auto& os: _overload_sets) {
-      if (os.name() == "__init__")
-        _initialiser = std::ref(os);
+    for (auto& set: _overload_sets) {
+      if (set.name() == "__init__")
+        _initialiser = std::ref(set);
 
 
-      auto md = PyType_GenericAlloc(&method_descriptor_definition, 0);
-      if (md == nullptr)
+      auto* mdesc = PyType_GenericAlloc(&method_descriptor_definition, 0);
+      if (mdesc == nullptr)
         return false;
 
-      std::bit_cast<method_descriptor*>(md)->set = &os;
-      std::bit_cast<method_descriptor*>(md)->mod = &mod;
-      std::bit_cast<method_descriptor*>(md)->vectorcall =
+      std::bit_cast<method_descriptor*>(mdesc)->set = &set;
+      std::bit_cast<method_descriptor*>(mdesc)->mod = &mod;
+      std::bit_cast<method_descriptor*>(mdesc)->vectorcall =
         (vectorcallfunc)method_descriptor_vectorcall;
 
-      if (PyObject_SetAttrString(_type_object, os.name().c_str(), md) < 0) {
+      if (PyObject_SetAttrString(_type_object, set.name().c_str(), mdesc) < 0) {
         Py_DECREF(_type_object);
-        Py_DECREF(md);
+        Py_DECREF(mdesc);
         return false;
       }
     }
@@ -54,7 +54,7 @@ namespace ligo {
     return true;
   }
 
-  int default_init(PyObject* self, PyObject*, PyObject*) {
+  int default_init(PyObject* self, PyObject* /* args */, PyObject* /* kwargs */) {
     PyErr_Format(PyExc_TypeError,
         "cannot create new instances of type %R: no constructor defined.",
         Py_TYPE(self));
