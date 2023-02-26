@@ -21,7 +21,7 @@ jobs:
       run: |
         sudo apt-get -qy update
         sudo apt-get install g++
-        python -m pip install cmake ninja pytest
+        python -m pip install cmake ninja pytest numpy
         ninja --version
         cmake --version
         g++ --version
@@ -30,7 +30,7 @@ jobs:
       if: ${{ startsWith(matrix.os, 'windows') }}
       run: |
         choco install ninja cmake
-        python -m pip install cmake ninja pytest
+        python -m pip install cmake ninja pytest numpy
         ninja --version
         cmake --version
         clang-tidy --version
