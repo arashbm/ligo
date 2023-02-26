@@ -9,7 +9,12 @@ option(LIGO_TIDY "Run clang-tidy with the build" OFF)
 
 if (NOT TARGET Python::Module OR NOT TARGET Python::Interpreter)
   set(Python_FIND_FRAMEWORK LAST)
-  find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+
+  if (WIN32 AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.26 AND Python_INTERPRETER_ID STREQUAL "Python")
+    find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
+  else()
+    find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+  endif()
 endif()
 
 include(FetchContent)
