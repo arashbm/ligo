@@ -25,7 +25,6 @@ jobs:
         ninja --version
         cmake --version
         g++ --version
-        clang-tidy --version
     - name: Install dependencies on windows
       if: ${{ startsWith(matrix.os, 'windows') }}
       run: |
@@ -33,7 +32,6 @@ jobs:
         python -m pip install cmake ninja pytest numpy
         ninja --version
         cmake --version
-        clang-tidy --version
     - uses: actions/checkout@v3
     - name: cmake build
       run: |
