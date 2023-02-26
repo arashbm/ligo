@@ -31,7 +31,7 @@ jobs:
         g++ --version
     - uses: actions/checkout@v3
     - name: cmake configure
-      run: cmake -Bbuild -S.
+      run: cmake -Bbuild -S. -DPYTHON_EXECUTABLE:FILEPATH=$(which python)
     - name: cmake build tests
       run: cmake --build build/ --target ligo_tests
     - name: Run tests
