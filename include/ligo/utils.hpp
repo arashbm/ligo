@@ -30,27 +30,28 @@ namespace ligo {
       using result_type = typename op_traits::result_type;
       using args = metal::drop<typename op_traits::args, metal::number<1>>;
       static constexpr std::size_t arity = op_traits::arity - 1;
+      static constexpr bool no_except = op_traits::no_except;
   };
 
-  template<typename R, typename ...Args>
-  struct function_traits<R(Args...)> {
+  template<typename R, bool X, typename ...Args>
+  struct function_traits<R(Args...) noexcept(X)> {
       static constexpr std::size_t arity = sizeof...(Args);
       using result_type = R;
       using args = metal::list<Args...>;
+      static constexpr bool no_except = X;
   };
 
   template<typename R, bool X, typename ...Args>
   struct function_traits<R(*)(Args...) noexcept(X)>
-    : public function_traits<R(Args...)> {};
-
+    : public function_traits<R(Args...) noexcept(X)> {};
 
   template<typename C, typename R, bool X, typename ...Args>
   struct function_traits<R(C::*)(Args...) noexcept(X)>
-    : public function_traits<R(C&, Args...)> {};
+    : public function_traits<R(C&, Args...) noexcept(X)> {};
 
   template<typename C, typename R, bool X, typename ...Args>
   struct function_traits<R(C::*)(Args...) const noexcept(X)>
-    : public function_traits<R(C&, Args...)> {};
+    : public function_traits<R(C&, Args...) noexcept(X)> {};
 }  // namespace ligo
 
 #endif  // INCLUDE_LIGO_UTILS_HPP_
