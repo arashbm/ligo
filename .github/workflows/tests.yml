@@ -10,13 +10,17 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, windows-2022, macos-12]
+        python: [3.9, 3.10, 3.11]
 
     steps:
+    - uses: actions/setup-python@v4
+      with: ${{ matrix.python }}
     - name: Install Pre-requisits on ubuntu
       if: ${{ startsWith(matrix.os, 'ubuntu') }}
       run: |
         sudo apt-get -qy update
-        sudo apt-get install g++ ninja-build cmake
+        sudo apt-get install g++
+        python -m pip install cmake ninja pytest
         ninja --version
         cmake --version
         g++ --version
@@ -25,8 +29,10 @@ jobs:
       if: ${{ startsWith(matrix.os, 'windows') }}
       run: |
         choco install ninja cmake
+        python -m pip install cmake ninja pytest
         ninja --version
         cmake --version
+        clang-tidy --version
     - uses: actions/checkout@v3
     - name: cmake build
       run: |
