@@ -3,11 +3,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-22.04, windows-2022, macos-12]
-
     name: Lint
     runs-on: ubuntu-22.04
 
