@@ -33,25 +33,45 @@ namespace ligo {
       static constexpr bool no_except = op_traits::no_except;
   };
 
-  template<typename R, bool X, typename ...Args>
-  struct function_traits<R(Args...) noexcept(X)> {
+  template<typename R, typename ...Args>
+  struct function_traits<R(Args...)> {
       static constexpr std::size_t arity = sizeof...(Args);
       using result_type = R;
       using args = metal::list<Args...>;
-      static constexpr bool no_except = X;
+      static constexpr bool no_except = false;
   };
 
-  template<typename R, bool X, typename ...Args>
-  struct function_traits<R(*)(Args...) noexcept(X)>
-    : public function_traits<R(Args...) noexcept(X)> {};
+  template<typename R, typename ...Args>
+  struct function_traits<R(Args...) noexcept> {
+      static constexpr std::size_t arity = sizeof...(Args);
+      using result_type = R;
+      using args = metal::list<Args...>;
+      static constexpr bool no_except = true;
+  };
 
-  template<typename C, typename R, bool X, typename ...Args>
-  struct function_traits<R(C::*)(Args...) noexcept(X)>
-    : public function_traits<R(C&, Args...) noexcept(X)> {};
+  template<typename R, typename ...Args>
+  struct function_traits<R(*)(Args...)>
+    : public function_traits<R(Args...)> {};
 
-  template<typename C, typename R, bool X, typename ...Args>
-  struct function_traits<R(C::*)(Args...) const noexcept(X)>
-    : public function_traits<R(C&, Args...) noexcept(X)> {};
+  template<typename R, typename ...Args>
+  struct function_traits<R(*)(Args...) noexcept>
+    : public function_traits<R(Args...) noexcept> {};
+
+  template<typename C, typename R, typename ...Args>
+  struct function_traits<R(C::*)(Args...)>
+    : public function_traits<R(C&, Args...)> {};
+
+  template<typename C, typename R, typename ...Args>
+  struct function_traits<R(C::*)(Args...) noexcept>
+    : public function_traits<R(C&, Args...) noexcept> {};
+
+  template<typename C, typename R, typename ...Args>
+  struct function_traits<R(C::*)(Args...) const>
+    : public function_traits<R(C&, Args...)> {};
+
+  template<typename C, typename R, typename ...Args>
+  struct function_traits<R(C::*)(Args...) const noexcept>
+    : public function_traits<R(C&, Args...) noexcept> {};
 }  // namespace ligo
 
 #endif  // INCLUDE_LIGO_UTILS_HPP_
