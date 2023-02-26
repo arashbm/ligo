@@ -16,26 +16,23 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
+    - name: Update CMake
+      uses: jwlawson/actions-setup-cmake@v1.13
+    - name: Install Python packages
+      run: |
+        python -m pip install ninja pytest numpy
+        ninja --version
+        cmake --version
     - name: Install Pre-requisits on ubuntu
       if: ${{ startsWith(matrix.os, 'ubuntu') }}
       run: |
         sudo apt-get -qy update
         sudo apt-get install g++
-        python -m pip install cmake ninja pytest numpy
-        ninja --version
-        cmake --version
         g++ --version
-    - name: Install dependencies on windows
-      if: ${{ startsWith(matrix.os, 'windows') }}
-      run: |
-        python -m pip install cmake ninja pytest numpy
-        ninja --version
-        cmake --version
     - uses: actions/checkout@v3
-    - name: cmake build
-      run: |
-        mkdir build
-        cmake -Bbuild -S.
-        cmake --build build/ --target ligo_tests
+    - name: cmake configure
+      run: cmake -Bbuild -S.
+    - name: cmake build tests
+      run: cmake --build build/ --target ligo_tests
     - name: Run tests
       run: pytest build
