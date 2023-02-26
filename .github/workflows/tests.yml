@@ -28,7 +28,6 @@ jobs:
     - name: Install dependencies on windows
       if: ${{ startsWith(matrix.os, 'windows') }}
       run: |
-        choco install ninja cmake
         python -m pip install cmake ninja pytest numpy
         ninja --version
         cmake --version
