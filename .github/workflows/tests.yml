@@ -3,18 +3,19 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: Tests on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, windows-2022, macos-12]
         python: ["3.9", "3.10", "3.11"]
 
+    name: Tests on ${{ matrix.os }} ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+
     steps:
     - uses: actions/setup-python@v4
-      with: ${{ matrix.python }}
+      with:
+        python-version: ${{ matrix.python }}
     - name: Install Pre-requisits on ubuntu
       if: ${{ startsWith(matrix.os, 'ubuntu') }}
       run: |
