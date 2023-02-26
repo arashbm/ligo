@@ -32,7 +32,7 @@ if(LIGO_TIDY)
     --config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy;
     --header-filter=${CMAKE_CURRENT_SOURCE_DIR}/include;
     --warnings-as-errors=*;)
-if(LIGO_TIDY)
+endif(LIGO_TIDY)
 
 add_library(${PROJECT_NAME} STATIC
   src/concrete_objects.cpp
