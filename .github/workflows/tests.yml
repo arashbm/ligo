@@ -41,5 +41,4 @@ jobs:
         cmake -Bbuild -S.
         cmake --build build/ --target ligo_tests
     - name: Run tests
-      working-directory: build
       run: pytest build
