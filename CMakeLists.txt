@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE True)
 
+option(LIGO_TIDY "Run clang-tidy with the build" OFF)
+
 if (NOT TARGET Python::Module OR NOT TARGET Python::Interpreter)
   set(Python_FIND_FRAMEWORK LAST)
   find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
@@ -24,11 +26,13 @@ FetchContent_MakeAvailable(fmt metal)
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_CXX_CLANG_TIDY
-  clang-tidy;
-  --config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy;
-  --header-filter=${CMAKE_CURRENT_SOURCE_DIR}/include;
-  --warnings-as-errors=*;)
+if(LIGO_TIDY)
+  set(CMAKE_CXX_CLANG_TIDY
+    clang-tidy;
+    --config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy;
+    --header-filter=${CMAKE_CURRENT_SOURCE_DIR}/include;
+    --warnings-as-errors=*;)
+if(LIGO_TIDY)
 
 add_library(${PROJECT_NAME} STATIC
   src/concrete_objects.cpp
