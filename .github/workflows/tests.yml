@@ -36,7 +36,7 @@ jobs:
         g++ --version
     - uses: actions/checkout@v3
     - name: cmake configure
-      run: cmake -Bbuild -S. -DPython_EXECUTABLE=${{ env.pythonLocation }}
+      run: cmake -Bbuild -S. -DPython_ROOT_DIR=${{ env.pythonLocation }}
     - name: cmake build tests
       run: cmake --build build/ --target ligo_tests
     - name: Run tests
