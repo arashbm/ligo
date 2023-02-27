@@ -1,8 +1,7 @@
 #ifndef INCLUDE_LIGO_PYTHON_TYPES_HPP_
 #define INCLUDE_LIGO_PYTHON_TYPES_HPP_
 
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#include "python.hpp"
 
 #include <vector>
 #include <string>

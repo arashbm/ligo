@@ -1,6 +1,7 @@
 #ifndef INCLUDE_LIGO_LIGO_HPP_
 #define INCLUDE_LIGO_LIGO_HPP_
 
+#include "python.hpp"
 #include "utils.hpp"
 #include "python_types.hpp"
 #include "handle.hpp"

@@ -1,8 +1,7 @@
 #ifndef INCLUDE_LIGO_ABSTRACT_OBJECTS_HPP_
 #define INCLUDE_LIGO_ABSTRACT_OBJECTS_HPP_
 
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#include "python.hpp"
 
 #include <optional>
 
