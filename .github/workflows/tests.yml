@@ -14,6 +14,7 @@ jobs:
 
     steps:
     - uses: actions/setup-python@v4
+      id: python_setup
       with:
         python-version: ${{ matrix.python }}
     - name: check Python
@@ -36,7 +37,7 @@ jobs:
         g++ --version
     - uses: actions/checkout@v3
     - name: cmake configure
-      run: cmake -Bbuild -S. -DPython_ROOT_DIR=${{ env.pythonLocation }}
+      run: cmake -Bbuild -S. -DPython_EXECUTABLE=${{ steps.python_setup.outputs.python-path }}
     - name: cmake build tests
       run: cmake --build build/ --target ligo_tests
     - name: Run tests
