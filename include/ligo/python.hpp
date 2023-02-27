@@ -2,22 +2,6 @@
 #define INCLUDE_LIGO_PYTHON_HPP_
 // use this file instead of including <Python.h>
 
-// disable linking to python*_d.lib on MSVC
-#if defined(_MSC_VER)
-#pragma warning(push)
-#if defined(_DEBUG) && !defined(Py_DEBUG)
-#define LIGO_DEBUG_MARKER
-#undef _DEBUG
-#endif
-#endif
-
-#include <cstdint>
-#include <stdexcept>
-#include <type_traits>
-#include <typeinfo>
-#include <utility>
-#include <new>
-
 #include <Python.h>
 
 // undefine the python overloads:
@@ -59,15 +43,6 @@
 
 #if defined(getter)
 #undef getter
-#endif
-
-// turn _DEBUG back to whatever it was
-#if defined(_MSC_VER)
-#if defined(LIGO_DEBUG_MARKER)
-#define _DEBUG
-#undef LIGO_DEBUG_MARKER
-#endif
-#pragma warning(pop)
 #endif
 
 #endif  // INCLUDE_LIGO_PYTHON_HPP_
