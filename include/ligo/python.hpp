@@ -56,7 +56,7 @@
 
 // turn _DEBUG back to whatever it was
 #if defined(_MSC_VER)
-#if defined(NB_DEBUG_MARKER)
+#if defined(LIGO_DEBUG_MARKER)
 #define _DEBUG
 #undef LIGO_DEBUG_MARKER
 #endif
