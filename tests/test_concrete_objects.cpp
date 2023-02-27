@@ -1,9 +1,9 @@
 #include <ligo/ligo.hpp>
 
-static ligo::python_module mod("libtest_concrete_objects",
+static ligo::python_module mod("test_concrete_objects_ext",
     "module for testing concrete types");
 
-PyMODINIT_FUNC PyInit_libtest_concrete_objects() {
+PyMODINIT_FUNC PyInit_test_concrete_objects_ext() {
   ligo::overload_set none_arg("none_arg");
   none_arg.add_overload([](ligo::python_none& /* param */) { Py_RETURN_TRUE; }, {"a"});
   none_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});

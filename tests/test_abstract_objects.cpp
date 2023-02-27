@@ -1,9 +1,9 @@
 #include <ligo/ligo.hpp>
 
-static ligo::python_module mod("libtest_abstract_objects",
+static ligo::python_module mod("test_abstract_objects_ext",
     "module for testing abstract types");
 
-PyMODINIT_FUNC PyInit_libtest_abstract_objects() {
+PyMODINIT_FUNC PyInit_test_abstract_objects_ext() {
   ligo::overload_set object_arg("object_arg");
   object_arg.add_overload(
       [](ligo::python_object& /* param */) { Py_RETURN_TRUE; }, {"a"});

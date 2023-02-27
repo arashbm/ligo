@@ -11,6 +11,13 @@
 #endif
 #endif
 
+#include <cstdint>
+#include <stdexcept>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
+#include <new>
+
 #include <Python.h>
 
 // undefine the python overloads:

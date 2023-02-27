@@ -1,6 +1,6 @@
 #include <ligo/ligo.hpp>
 
-static ligo::python_module mod("libtest_exceptions",
+static ligo::python_module mod("test_exceptions_ext",
     "module for testing exceptions");
 
 PyObject* test_python_exception() {
@@ -68,7 +68,7 @@ PyObject* test_exception_subclass() {
 }
 
 
-PyMODINIT_FUNC PyInit_libtest_exceptions() {
+PyMODINIT_FUNC PyInit_test_exceptions_ext() {
   ligo::overload_set tpe("test_python_exception");
   tpe.add_overload(&test_python_exception, {});
   mod.add_overload_set(tpe);

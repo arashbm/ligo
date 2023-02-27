@@ -2,7 +2,7 @@
 
 #include <ligo/ligo.hpp>
 
-static ligo::python_module mod("libtest_types", "module for testing types");
+static ligo::python_module mod("test_types_ext", "module for testing types");
 
 class hello {
 public:
@@ -33,7 +33,7 @@ public:
   };
 };
 
-PyMODINIT_FUNC PyInit_libtest_types() {
+PyMODINIT_FUNC PyInit_test_types_ext() {
   ligo::python_type<int> int_type("int", "int type");
   ligo::overload_set int_repr("__repr__");
   int_repr.add_overload([](int a_param){

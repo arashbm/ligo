@@ -47,8 +47,34 @@ add_library(${PROJECT_NAME} STATIC
   src/python_module.cpp
   src/python_types.cpp
   src/python_methods.cpp)
-target_link_libraries(${PROJECT_NAME} PUBLIC fmt Metal)
+target_link_libraries(${PROJECT_NAME} PUBLIC fmt Metal Python::Module)
 target_include_directories(${PROJECT_NAME} PUBLIC include/)
-target_include_directories(${PROJECT_NAME} PRIVATE ${Python_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${Python_INCLUDE_DIRS})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    POSITION_INDEPENDENT_CODE ON)
+
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" "-c"
+    "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))"
+  RESULT_VARIABLE LIGO_SUFFIX_RET
+  OUTPUT_VARIABLE LIGO_SUFFIX
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+if (LIGO_SUFFIX_RET AND NOT LIGO_SUFFIX_RET EQUAL 0)
+  message(FATAL_ERROR "Ligo failed to find correct value for 'EXT_SUFFIX'")
+endif()
+set(LIGO_SUFFIX ${LIGO_SUFFIX} CACHE INTERNAL "")
+
+function(ligo_add_module name)
+  add_library(${name} MODULE ${ARGN})
+  if (MSVC)
+    target_compile_options(${name} PRIVATE /bigobj /MP)
+  endif()
+  set_target_properties(${name} PROPERTIES PREFIX "" SUFFIX "${LIGO_SUFFIX}")
+  set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
+  target_link_libraries(${name} PRIVATE ligo)
+  set_target_properties(${name} PROPERTIES CXX_VISIBILITY_PRESET hidden)
+endfunction()
 
 add_subdirectory(tests)

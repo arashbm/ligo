@@ -1,6 +1,6 @@
 #include <ligo/ligo.hpp>
 
-static ligo::python_module mod("libtest_methods", "module for testing methods");
+static ligo::python_module mod("test_methods_ext", "module for testing methods");
 
 PyObject* test_function(PyObject* /* a */, PyObject* /* b */) noexcept {
   Py_RETURN_TRUE;
@@ -10,7 +10,7 @@ PyObject* test_function_noexcept(PyObject* /* a */, PyObject* /* b */) noexcept 
   Py_RETURN_TRUE;
 }
 
-PyMODINIT_FUNC PyInit_libtest_methods() {
+PyMODINIT_FUNC PyInit_test_methods_ext() {
   ligo::overload_set simple_set("simple_overloading");
   simple_set.add_overload([]() -> PyObject* { Py_RETURN_TRUE; }, {});
   simple_set.add_overload([](PyObject* obj) -> PyObject* {

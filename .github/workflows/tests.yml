@@ -39,6 +39,10 @@ jobs:
     - name: cmake configure
       run: cmake -Bbuild -S. -DPython_EXECUTABLE=${{ steps.python_setup.outputs.python-path }}
     - name: cmake build tests
+      if: ${{ !startsWith(matrix.os, 'windows') }}
       run: cmake --build build/ --target ligo_tests
+    - name: cmake build tests (windows)
+      if: ${{ startsWith(matrix.os, 'windows') }}
+      run: cmake --build build/ --target ligo_tests --config Release
     - name: Run tests
       run: pytest build
