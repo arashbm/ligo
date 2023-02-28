@@ -136,14 +136,15 @@ namespace ligo {
     PyObject* const* args, std::size_t nargs, PyObject* kwnames,
     std::unordered_map<std::string, std::size_t> kw_index) {
     // check total number of arguments
-    std::size_t total_args_len = PyVectorcall_NARGS(nargs);
+    std::size_t positional_args_len = PyVectorcall_NARGS(nargs);
+    std::size_t total_args_len = positional_args_len;
     if (kwnames != nullptr)
       total_args_len += static_cast<std::size_t>(PyObject_Length(kwnames));
     if (total_args_len != function_traits<F>::arity)
       return {};
 
     std::array<PyObject*, function_traits<F>::arity> py_args{};
-    for (std::size_t i{}; i < PyVectorcall_NARGS(nargs); i++)
+    for (std::size_t i{}; i < positional_args_len; i++)
       py_args.at(i) = args[i];
 
     if (kwnames) {
