@@ -1,6 +1,6 @@
 #include <ligo/ligo.hpp>
 
-LIGO_MODULE(test_abstract_objcets_ext, "module for testing abstract types", mod) {
+LIGO_MODULE(test_abstract_objects_ext, "module for testing abstract types", mod) {
   ligo::overload_set object_arg("object_arg");
   object_arg.add_overload(
       [](ligo::python_object& /* param */) { Py_RETURN_TRUE; }, {"a"});
