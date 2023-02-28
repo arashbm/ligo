@@ -8,6 +8,7 @@
 #include "handle.hpp"
 #include "python_methods.hpp"
 #include "python_module.hpp"
+#include "macros.hpp"
 
 #include "impl/python_types.tpp"
 #include "impl/handle.tpp"

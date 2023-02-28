@@ -2,8 +2,6 @@
 
 #include <ligo/ligo.hpp>
 
-static ligo::python_module mod("test_types_ext", "module for testing types");
-
 class hello {
 public:
   hello() = default;
@@ -33,7 +31,7 @@ public:
   };
 };
 
-PyMODINIT_FUNC PyInit_test_types_ext() {
+LIGO_MODULE(test_types_ext, "module for testing types", mod) {
   ligo::python_type<int> int_type("int", "int type");
   ligo::overload_set int_repr("__repr__");
   int_repr.add_overload([](int a_param){
@@ -106,6 +104,4 @@ PyMODINIT_FUNC PyInit_test_types_ext() {
   ligo::overload_set tboc("type_based_overload_casting");
   tboc.add_overload([](const world& /* hlo */) -> PyObject* { Py_RETURN_TRUE; }, {"a"});
   mod.add_overload_set(tboc);
-
-  return mod.init();
 }

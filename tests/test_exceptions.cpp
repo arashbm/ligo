@@ -1,8 +1,5 @@
 #include <ligo/ligo.hpp>
 
-static ligo::python_module mod("test_exceptions_ext",
-    "module for testing exceptions");
-
 PyObject* test_python_exception() {
   PyErr_SetString(PyExc_RuntimeError, "threw python_exception");
   throw ligo::python_exception();
@@ -68,7 +65,7 @@ PyObject* test_exception_subclass() {
 }
 
 
-PyMODINIT_FUNC PyInit_test_exceptions_ext() {
+LIGO_MODULE(test_exceptions_ext, "module for testing exception translation", mod) {
   ligo::overload_set tpe("test_python_exception");
   tpe.add_overload(&test_python_exception, {});
   mod.add_overload_set(tpe);
@@ -112,6 +109,4 @@ PyMODINIT_FUNC PyInit_test_exceptions_ext() {
   ligo::overload_set tes("test_exception_subclass");
   tes.add_overload(&test_exception_subclass, {});
   mod.add_overload_set(tes);
-
-  return mod.init();
 }
