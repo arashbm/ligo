@@ -125,8 +125,8 @@ namespace ligo {
       bound_method* self, PyObject* args, PyObject* kwds) {
     PyObject* method_desc = nullptr;
     PyObject* obj = nullptr;
-    if (!PyArg_ParseTupleAndKeywords(
-          args, kwds, "O", nullptr, &method_desc, &obj))
+    if (PyArg_ParseTupleAndKeywords(
+          args, kwds, "O", nullptr, &method_desc, &obj) == 0)
       return -1;
 
     if (!PyObject_TypeCheck(method_desc, &method_descriptor_definition)) {
