@@ -1,6 +1,8 @@
 #include "../include/ligo/python_methods.hpp"
 #include "../include/ligo/impl/python_methods.tpp"
 
+#include "../include/ligo/bit_cast.hpp"
+
 #include <unordered_set>
 
 namespace ligo {
@@ -66,11 +68,11 @@ namespace ligo {
       auto* bmeth = PyType_GenericAlloc(&bound_method_definition, 0);
       if (bmeth == nullptr)
         return PyErr_NoMemory();
-      std::bit_cast<bound_method*>(bmeth)->set = descr->set;
-      std::bit_cast<bound_method*>(bmeth)->mod = descr->mod;
+      bit_cast<bound_method*>(bmeth)->set = descr->set;
+      bit_cast<bound_method*>(bmeth)->mod = descr->mod;
       Py_INCREF(obj);
-      std::bit_cast<bound_method*>(bmeth)->obj = obj;
-      std::bit_cast<bound_method*>(bmeth)->vectorcall =
+      bit_cast<bound_method*>(bmeth)->obj = obj;
+      bit_cast<bound_method*>(bmeth)->vectorcall =
         (vectorcallfunc)bound_method_vectorcall;
       Py_INCREF(bmeth);
       return bmeth;
@@ -135,7 +137,7 @@ namespace ligo {
       return -1;
     }
 
-    auto* mdesc = std::bit_cast<method_descriptor*>(method_desc);
+    auto* mdesc = bit_cast<method_descriptor*>(method_desc);
 
     PyObject* prev_obj = self->obj;
     Py_INCREF(obj);

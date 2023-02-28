@@ -1,6 +1,5 @@
-#include <bit>
-
 #include "../include/ligo/python_types.hpp"
+#include "../include/ligo/bit_cast.hpp"
 
 namespace ligo {
   std::string final_python_type::name() const {
@@ -39,9 +38,9 @@ namespace ligo {
       if (mdesc == nullptr)
         return false;
 
-      std::bit_cast<method_descriptor*>(mdesc)->set = &set;
-      std::bit_cast<method_descriptor*>(mdesc)->mod = &mod;
-      std::bit_cast<method_descriptor*>(mdesc)->vectorcall =
+      bit_cast<method_descriptor*>(mdesc)->set = &set;
+      bit_cast<method_descriptor*>(mdesc)->mod = &mod;
+      bit_cast<method_descriptor*>(mdesc)->vectorcall =
         (vectorcallfunc)method_descriptor_vectorcall;
 
       if (PyObject_SetAttrString(_type_object, set.name().c_str(), mdesc) < 0) {

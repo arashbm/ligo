@@ -2,6 +2,7 @@
 #define INCLUDE_LIGO_LIGO_HPP_
 
 #include "python.hpp"
+#include "bit_cast.hpp"
 #include "utils.hpp"
 #include "python_types.hpp"
 #include "handle.hpp"

@@ -1,8 +1,7 @@
-#include <bit>
-
 #include "../include/ligo/python_module.hpp"
 #include "../include/ligo/impl/python_module.tpp"
 
+#include "../include/ligo/bit_cast.hpp"
 #include "../include/ligo/python_types.hpp"
 
 namespace ligo {
@@ -40,7 +39,7 @@ namespace ligo {
       return nullptr;
     Py_INCREF(&bound_method_definition);
     if (PyModule_AddObject(mod, "_bound_method",
-          std::bit_cast<PyObject*>(&bound_method_definition)) < 0) {
+          bit_cast<PyObject*>(&bound_method_definition)) < 0) {
       Py_DECREF(&bound_method_definition);
       Py_DECREF(mod);
       return nullptr;
@@ -50,7 +49,7 @@ namespace ligo {
       return nullptr;
     Py_INCREF(&method_descriptor_definition);
     if (PyModule_AddObject(mod, "_method_descriptor",
-          std::bit_cast<PyObject*>(&method_descriptor_definition)) < 0) {
+          bit_cast<PyObject*>(&method_descriptor_definition)) < 0) {
       Py_DECREF(&method_descriptor_definition);
       Py_DECREF(mod);
       return nullptr;
@@ -62,9 +61,9 @@ namespace ligo {
       if (mdesc == nullptr)
         return nullptr;
 
-      std::bit_cast<method_descriptor*>(mdesc)->set = &set;
-      std::bit_cast<method_descriptor*>(mdesc)->mod = this;
-      std::bit_cast<method_descriptor*>(mdesc)->vectorcall =
+      bit_cast<method_descriptor*>(mdesc)->set = &set;
+      bit_cast<method_descriptor*>(mdesc)->mod = this;
+      bit_cast<method_descriptor*>(mdesc)->vectorcall =
         (vectorcallfunc)method_descriptor_vectorcall;
 
       if (PyModule_AddObject(mod, set.name().c_str(), mdesc) < 0) {

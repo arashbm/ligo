@@ -5,6 +5,7 @@
 
 #include "../handle.hpp"
 
+#include "../bit_cast.hpp"
 #include "../python_types.hpp"
 #include "../python_module.hpp"
 
@@ -18,7 +19,7 @@ namespace ligo {
     if (auto ftype = mod.final_type(typeid(T))) {
       if (auto* obj = PyType_GenericAlloc(
             (PyTypeObject*)ftype->get().type_object(), 0)) {
-        std::bit_cast<pod<T>*>(obj)->value = value;
+        bit_cast<pod<T>*>(obj)->value = value;
         return handle<T>(obj, mod);
       }
     }
@@ -62,11 +63,11 @@ namespace ligo {
   }
 
   template <typename T>
-  handle<T>::operator T*() { return &std::bit_cast<pod<T>*>(_obj)->value; }
+  handle<T>::operator T*() { return &bit_cast<pod<T>*>(_obj)->value; }
   template <typename T>
-  handle<T>::operator T() const { return std::bit_cast<pod<T>*>(_obj)->value; }
+  handle<T>::operator T() const { return bit_cast<pod<T>*>(_obj)->value; }
   template <typename T>
-  handle<T>::operator T&() { return std::bit_cast<pod<T>*>(_obj)->value; }
+  handle<T>::operator T&() { return bit_cast<pod<T>*>(_obj)->value; }
 
   template <typename T>
   PyObject* handle<T>::object() { return _obj; }
