@@ -23,4 +23,4 @@ jobs:
       run: |
         mkdir build
         cmake -Bbuild -DLIGO_TIDY=ON -S.
-        cmake --build build/ --target ligo_tests
+        cmake --build build/ --target ligo_tests -j 2

@@ -43,6 +43,6 @@ jobs:
       run: cmake --build build/ --target ligo_tests
     - name: cmake build tests (windows)
       if: ${{ startsWith(matrix.os, 'windows') }}
-      run: cmake --build build/ --target ligo_tests --config Release
+      run: cmake --build build/ --target ligo_tests --config Release -j 2
     - name: Run tests
       run: pytest build
