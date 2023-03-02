@@ -1,0 +1,30 @@
+name: Profile
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Profile
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    - name: Install Pre-requisits on ubuntu
+      run: |
+        sudo apt-get -qy update
+        sudo apt-get install g++
+        python -m pip install cmake ninja pytest numpy py-spy
+    - uses: actions/checkout@v3
+    - name: CMake build
+      run: |
+        mkdir build
+        cmake -Bbuild -DCMAKE_BUILD_TYPE=RelWithDebInfo -S.
+        cmake --build build/ --target ligo_bench -j 2
+    - name: Profile
+      run: py-spy record --rate 500 -f speedscope -o methods.json --native -- python build/bench/bench_methods.py
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+	name: methods-profile
+	path: methods.json
