@@ -26,5 +26,5 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
-	name: methods-profile
-	path: methods.json
+        name: methods-profile
+        path: methods.json
