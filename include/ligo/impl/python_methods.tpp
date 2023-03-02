@@ -149,7 +149,7 @@ namespace ligo {
 
     if (kwnames) {
       for (ptrdiff_t i{}; i < PyObject_Length(kwnames); i++) {
-        auto* kwstr = PyUnicode_AsUTF8(PyTuple_GetItem(kwnames, i));
+        const auto* kwstr = PyUnicode_AsUTF8(PyTuple_GetItem(kwnames, i));
         if (!kwstr)
           return {};
 
