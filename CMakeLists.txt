@@ -78,3 +78,4 @@ function(ligo_add_module name)
 endfunction()
 
 add_subdirectory(tests)
+add_subdirectory(bench)
