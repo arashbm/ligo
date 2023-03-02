@@ -134,7 +134,7 @@ namespace ligo {
   std::optional<std::array<PyObject*, function_traits<F>::arity>>
   _ordered_arguments(
     PyObject* const* args, std::size_t nargs, PyObject* kwnames,
-    std::unordered_map<std::string, std::size_t> kw_index) {
+    const std::unordered_map<std::string, std::size_t>& kw_index) {
     // check total number of arguments
     std::size_t positional_args_len = PyVectorcall_NARGS(nargs);
     std::size_t total_args_len = positional_args_len;
@@ -149,10 +149,7 @@ namespace ligo {
 
     if (kwnames) {
       for (ptrdiff_t i{}; i < PyObject_Length(kwnames); i++) {
-        auto* kwrd = PyUnicode_AsUTF8String(PyTuple_GetItem(kwnames, i));
-        if (kwrd == nullptr)
-          return {};
-        auto* kwstr = PyBytes_AsString(kwrd);
+        auto* kwstr = PyUnicode_AsUTF8(PyTuple_GetItem(kwnames, i));
         if (!kwstr)
           return {};
 
