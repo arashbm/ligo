@@ -135,11 +135,14 @@ namespace ligo {
   _ordered_arguments(
     PyObject* const* args, std::size_t nargs, PyObject* kwnames,
     const std::unordered_map<std::string, std::size_t>& kw_index) {
-    // check total number of arguments
     std::size_t positional_args_len = PyVectorcall_NARGS(nargs);
     std::size_t total_args_len = positional_args_len;
+    std::size_t kw_length = 0;
+
     if (kwnames != nullptr)
-      total_args_len += static_cast<std::size_t>(PyObject_Length(kwnames));
+      kw_length = static_cast<std::size_t>(PyObject_Length(kwnames));
+    total_args_len += kw_length;
+
     if (total_args_len != function_traits<F>::arity)
       return {};
 
@@ -147,15 +150,15 @@ namespace ligo {
     for (std::size_t i{}; i < positional_args_len; i++)
       py_args.at(i) = args[i];
 
-    if (kwnames) {
-      for (ptrdiff_t i{}; i < PyObject_Length(kwnames); i++) {
+    if (kw_length > 0) {
+      for (ptrdiff_t i{}; i < kw_length; i++) {
         const auto* kwstr = PyUnicode_AsUTF8(PyTuple_GetItem(kwnames, i));
         if (!kwstr)
           return {};
 
         auto idx = kw_index.find(kwstr);
         if (idx != kw_index.end())
-          py_args.at(idx->second) = args[i + PyObject_Length(kwnames)];
+          py_args.at(idx->second) = args[i + kw_length];
         else
           return {};  // received an unknown keyword argument
       }
