@@ -26,6 +26,19 @@ namespace ligo {
     python_type(const std::string& name, const std::string& docs);
 
     void add_overload_set(const overload_set& set);
+    template<typename F>
+    void overload_method(const std::string& name, F&& func,
+      const std::array<std::string, function_traits<F>::arity>& keywords);
+    template<typename F>
+    void define_method(const std::string& name, F&& func,
+      const std::array<std::string, function_traits<F>::arity>& keywords);
+
+    template<typename F>
+    void implicit_overload_method(const std::string& name, F&& func,
+      const std::array<std::string, function_traits<F>::arity>& keywords);
+    template<typename F>
+    void implicit_define_method(const std::string& name, F&& func,
+      const std::array<std::string, function_traits<F>::arity>& keywords);
 
     std::string name() const;
     std::string docs() const;

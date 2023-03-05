@@ -1,45 +1,59 @@
 #include <ligo/ligo.hpp>
 
 LIGO_MODULE(test_abstract_objects_ext, "module for testing abstract types", mod) {
-  ligo::overload_set object_arg("object_arg");
-  object_arg.add_overload(
-      [](ligo::python_object& /* param */) { Py_RETURN_TRUE; }, {"a"});
-  object_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
-  mod.add_overload_set(object_arg);
+  mod.overload_method("object_arg",
+                      [](ligo::python_object& /* param */) {
+                          Py_RETURN_TRUE;
+                      }, {"a"});
+  mod.overload_method("object_arg",
+                      [](PyObject*) {
+                          Py_RETURN_FALSE;
+                      }, {"a"});
 
 
-  ligo::overload_set callable_arg("callable_arg");
-  callable_arg.add_overload(
-      [](ligo::python_callable& /* param */) { Py_RETURN_TRUE; }, {"a"});
-  callable_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
-  mod.add_overload_set(callable_arg);
+  mod.overload_method("callable_arg",
+                      [](ligo::python_callable& /* param */) {
+                          Py_RETURN_TRUE;
+                      }, {"a"});
+  mod.overload_method("callable_arg",
+                      [](PyObject*) { Py_RETURN_FALSE; }, {"a"});
 
 
-  ligo::overload_set number_arg("number_arg");
-  number_arg.add_overload(
-      [](ligo::python_number& /* param */) { Py_RETURN_TRUE; }, {"a"});
-  number_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
-  mod.add_overload_set(number_arg);
+  mod.overload_method("number_arg",
+                      [](ligo::python_number& /* param */) {
+                          Py_RETURN_TRUE;
+                      }, {"a"});
+  mod.overload_method("number_arg",
+                      [](PyObject*) {
+                          Py_RETURN_FALSE;
+                      }, {"a"});
 
 
-  ligo::overload_set index_arg("index_arg");
-  index_arg.add_overload(
-      [](ligo::python_index& /* param */) { Py_RETURN_TRUE; }, {"a"});
-  index_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
-  mod.add_overload_set(index_arg);
+  mod.overload_method("index_arg",
+                      [](ligo::python_index& /* param */) {
+                          Py_RETURN_TRUE;
+                      }, {"a"});
+  mod.overload_method("index_arg",
+                      [](PyObject*) {
+                          Py_RETURN_FALSE;
+                      }, {"a"});
 
 
-  ligo::overload_set sequence_arg("sequence_arg");
-  sequence_arg.add_overload(
-      [](ligo::python_sequence& /* param */) { Py_RETURN_TRUE; }, {"a"});
-  sequence_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
-  mod.add_overload_set(sequence_arg);
+  mod.overload_method("sequence_arg",
+                      [](ligo::python_sequence& /* param */) {
+                          Py_RETURN_TRUE;
+                      }, {"a"});
+  mod.overload_method("sequence_arg",
+                      [](PyObject*) {
+                          Py_RETURN_FALSE;
+                      }, {"a"});
 
-
-  ligo::overload_set mapping_arg("mapping_arg");
-  mapping_arg.add_overload([](ligo::python_mapping& /* param */) {
-      Py_RETURN_TRUE;
-    }, {"a"});
-  mapping_arg.add_overload([](PyObject*) { Py_RETURN_FALSE; }, {"a"});
-  mod.add_overload_set(mapping_arg);
+  mod.overload_method("mapping_arg",
+                      [](ligo::python_mapping& /* param */) {
+                          Py_RETURN_TRUE;
+                      }, {"a"});
+  mod.overload_method("mapping_arg",
+                      [](PyObject*) {
+                          Py_RETURN_FALSE;
+                      }, {"a"});
 }

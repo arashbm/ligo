@@ -214,20 +214,18 @@ namespace ligo {
 
   template<typename F>
   void overload_set::add_overload(F&& func,
-      std::array<std::string, function_traits<F>::arity> keywords) {
-    _wrap_and_add(std::forward<F>(func),
-        std::forward<decltype(keywords)>(keywords), false);
+      const std::array<std::string, function_traits<F>::arity>& keywords) {
+    _wrap_and_add(std::forward<F>(func), keywords, false);
   }
 
   template<typename F>
   void overload_set::add_implicit_overload(F&& func,
-      std::array<std::string, function_traits<F>::arity> keywords) {
+      const std::array<std::string, function_traits<F>::arity>& keywords) {
     if (_name != "__init__")
       throw std::logic_error(
           "methods other than the initiliser cannot be implicit");
 
-    _wrap_and_add(std::forward<F>(func),
-        std::forward<decltype(keywords)>(keywords), true);
+    _wrap_and_add(std::forward<F>(func), keywords, true);
   }
 }  // namespace ligo
 

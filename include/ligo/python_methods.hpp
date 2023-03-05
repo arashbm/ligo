@@ -33,11 +33,11 @@ namespace ligo {
 
     template<typename F>
     void add_overload(F&& func,
-      std::array<std::string, function_traits<F>::arity> keywords);
+      const std::array<std::string, function_traits<F>::arity>& keywords);
 
     template<typename F>
     void add_implicit_overload(F&& func,
-      std::array<std::string, function_traits<F>::arity> keywords);
+      const std::array<std::string, function_traits<F>::arity>& keywords);
 
     PyObject* operator()(PyObject* const* args,
         std::size_t nargs, PyObject* kwnames, python_module& mod);

@@ -9,6 +9,10 @@ namespace ligo {
       const std::string& name, const std::string& docs) noexcept
     : _name{name}, _docs{docs}, _definition{} {}
 
+  python_module::python_module(
+      const std::string& name) noexcept
+    : _name{name}, _definition{} {}
+
   std::string python_module::name() const {
     return _name;
   }
@@ -18,7 +22,7 @@ namespace ligo {
   }
 
   void python_module::add_overload_set(const overload_set& set) {
-    _methods.push_back(set);
+    _methods.insert_or_assign(set.name(), set);
   }
 
   PyObject* python_module::init() {
@@ -56,7 +60,7 @@ namespace ligo {
     }
 
     // add methods
-    for (auto& set: _methods) {
+    for (auto& [name, set]: _methods) {
       auto* mdesc = PyType_GenericAlloc(&method_descriptor_definition, 0);
       if (mdesc == nullptr)
         return nullptr;
@@ -66,7 +70,7 @@ namespace ligo {
       bit_cast<method_descriptor*>(mdesc)->vectorcall =
         (vectorcallfunc)method_descriptor_vectorcall;
 
-      if (PyModule_AddObject(mod, set.name().c_str(), mdesc) < 0) {
+      if (PyModule_AddObject(mod, name.c_str(), mdesc) < 0) {
         Py_DECREF(mdesc);
         Py_DECREF(mod);
         return nullptr;
