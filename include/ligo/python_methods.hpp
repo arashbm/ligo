@@ -1,6 +1,7 @@
 #ifndef INCLUDE_LIGO_PYTHON_METHODS_HPP_
 #define INCLUDE_LIGO_PYTHON_METHODS_HPP_
 
+#include "ligo/gil.hpp"
 #include "python.hpp"
 
 #include <concepts>
@@ -26,18 +27,33 @@ namespace ligo {
 
   class overload_set {
   public:
+    template<typename T>
+    struct argument {
+      std::string name;
+      std::optional<T> default_value = {};
+      bool convert = true;
+    };
+
+    template<typename F, typename ...Guards>
+    struct method_properties {
+    };
+
+    template<typename F>
+    using args_tuple = metal::apply<metal::lambda<std::tuple>,
+      metal::transform<metal::lambda<argument>, typename function_traits<F>::args>>;
+
     using wrapped_function = std::optional<PyObject*>(
         PyObject* const*, std::size_t, PyObject*, python_module&, bool);
 
     explicit overload_set(const std::string& name);
 
-    template<typename F>
-    void add_overload(F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
+    template<typename F, typename ...Guards>
+    void add_overload(F&& func, const args_tuple<F>& args,
+      call_gurad<Guards...> guards = call_gurad<Guards...>{});
 
-    template<typename F>
-    void add_implicit_overload(F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
+    template<typename F, typename ...Guards>
+    void add_implicit_overload(F&& func, const args_tuple<F>& args,
+      call_gurad<Guards...> guards = call_gurad<Guards...>{});
 
     PyObject* operator()(PyObject* const* args,
         std::size_t nargs, PyObject* kwnames, python_module& mod);

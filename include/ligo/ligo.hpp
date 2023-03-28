@@ -4,6 +4,7 @@
 #include "python.hpp"
 #include "bit_cast.hpp"
 #include "utils.hpp"
+#include "gil.hpp"
 #include "python_types.hpp"
 #include "handle.hpp"
 #include "python_methods.hpp"

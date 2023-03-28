@@ -1,3 +1,4 @@
+#include "ligo/gil.hpp"
 #include <ligo/ligo.hpp>
 
 PyObject* test_function(PyObject* /* a */, PyObject* /* b */) noexcept {
@@ -15,7 +16,7 @@ LIGO_MODULE(test_methods_ext, "module for testing methods", mod) {
   mod.overload_method("simple_overloading", [](PyObject* obj) -> PyObject* {
                         Py_INCREF(obj);
                         return obj;
-                      }, {"a"});
+                      }, {{"a"}});
 
   mod.define_method("noexcept_lambda",
                     []() noexcept -> PyObject* { Py_RETURN_TRUE; }, {});
@@ -26,6 +27,26 @@ LIGO_MODULE(test_methods_ext, "module for testing methods", mod) {
   mod.define_method("capturing_lambda", [a, b, c, d]() -> PyObject* {
                       return PyLong_FromSize_t(a + b + c + d);
                     }, {});
-  mod.define_method("fpointer", &test_function, {"a", "b"});
-  mod.define_method("fpointer_noexcept", &test_function_noexcept, {"a", "b"});
+  mod.define_method("fpointer", &test_function, {{"a"}, {"b"}});
+  mod.define_method("fpointer_noexcept", &test_function_noexcept, {{"a"}, {"b"}});
+
+  mod.define_method("gil_default", [](){
+                      return PyGILState_Check() == 1;
+                    }, {});
+  mod.define_method("with_no_gil",
+                    [](){ return PyGILState_Check() == 1; }, {},
+                    ligo::call_gurad<ligo::gil_scoped_release>{});
+  mod.define_method("with_no_gil_params",
+                    [](PyObject* /* a */){ return PyGILState_Check() == 1; },
+                    {}, ligo::call_gurad<ligo::gil_scoped_release>{});
+  mod.define_method("release_gil",
+                    [](){
+                      ligo::gil_scoped_release rel{};
+                      return PyGILState_Check() == 1;
+                    }, {});
+  mod.define_method("acquire_gil",
+                    [](){
+                      ligo::gil_scoped_acquire acq{};
+                      return PyGILState_Check() == 1;
+                    }, {}, ligo::call_gurad<ligo::gil_scoped_release>{});
 }
