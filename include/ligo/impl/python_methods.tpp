@@ -119,7 +119,7 @@ namespace ligo {
     }
   };
 
-  template<typename ...Args, size_t... Is>
+  template<typename ...Args, size_t ...Is>
   std::unordered_map<std::string, std::size_t>
   _keyword_indecies_impl(
       const std::tuple<Args...>& args,
@@ -130,7 +130,7 @@ namespace ligo {
     return kw_index;
   }
 
-  template<typename ...Args, size_t... Is>
+  template<typename ...Args>
   std::unordered_map<std::string, std::size_t>
   _keyword_indecies(const std::tuple<Args...>& args) {
     return _keyword_indecies_impl(args, std::index_sequence_for<Args...>());
