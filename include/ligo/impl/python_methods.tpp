@@ -7,6 +7,7 @@
 #include <bit>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 #include "../python_methods.hpp"
 
@@ -118,16 +119,21 @@ namespace ligo {
     }
   };
 
-  template<typename F>
+  template<typename ...Args, size_t... Is>
   std::unordered_map<std::string, std::size_t>
-  _keyword_indecies(
-      const std::array<std::string, function_traits<F>::arity>& keywords) {
+  _keyword_indecies_impl(
+      const std::tuple<Args...>& args,
+      std::index_sequence<Is...> /* is */) {
     std::unordered_map<std::string, std::size_t> kw_index;
-
-    for (std::size_t i{}; i < function_traits<F>::arity; i++)
-      kw_index[keywords.at(i)] = i;
+    (kw_index.emplace(std::get<Is>(args).name, Is), ...);
 
     return kw_index;
+  }
+
+  template<typename ...Args, size_t... Is>
+  std::unordered_map<std::string, std::size_t>
+  _keyword_indecies(const std::tuple<Args...>& args) {
+    return _keyword_indecies_impl(args, std::index_sequence_for<Args...>());
   }
 
   template<typename F>
@@ -166,13 +172,14 @@ namespace ligo {
     return py_args;
   }
 
-  template<typename F>
+  template<typename F, typename ...Guards>
   void overload_set::_wrap_and_add(
       F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords,
+      const overload_set::args_tuple<F>& args,
+      call_gurad<Guards...> /* guards */,
       bool implicit) {
     using traits = function_traits<F>;
-    auto kw_index = _keyword_indecies<F>(keywords);
+    auto kw_index = _keyword_indecies(args);
     auto impl = [func, kw_index](
         PyObject* const* args, std::size_t nargs,
         PyObject* kwnames, python_module& mod, bool cast)
@@ -191,12 +198,18 @@ namespace ligo {
       PyObject* res = nullptr;
       try {
         if constexpr (std::is_void_v<typename traits::result_type>) {
-          std::apply(func, *t_args);
+          [&func, &t_args](){
+            std::tuple<Guards...> grds{};
+            std::apply(func, *t_args);
+          }();
           Py_RETURN_NONE;
         } else {
           if (auto return_val_handle = handle<
               std::remove_cvref_t<typename traits::result_type>>::from_cpp(
-                std::apply(func, *t_args), mod))
+                [&func, &t_args](){
+                  std::tuple<Guards...> grds{};
+                  return std::apply(func, *t_args);
+                }(), mod))
             return return_val_handle->object();
           else
             return PyErr_Format(PyExc_TypeError,
@@ -212,20 +225,21 @@ namespace ligo {
     _overloads.emplace_back(implicit, impl);
   }
 
-  template<typename F>
-  void overload_set::add_overload(F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords) {
-    _wrap_and_add(std::forward<F>(func), keywords, false);
+  template<typename F, typename ...Guards>
+  void overload_set::add_overload(
+      F&& func, const overload_set::args_tuple<F>& args,
+      call_gurad<Guards...> guards) {
+    _wrap_and_add(std::forward<F>(func), args, guards, false);
   }
 
-  template<typename F>
-  void overload_set::add_implicit_overload(F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords) {
+  template<typename F, typename ...Guards>
+  void overload_set::add_implicit_overload(
+      F&& func, const overload_set::args_tuple<F>& args,
+      call_gurad<Guards...> guards) {
     if (_name != "__init__")
       throw std::logic_error(
           "methods other than the initiliser cannot be implicit");
-
-    _wrap_and_add(std::forward<F>(func), keywords, true);
+    _wrap_and_add(std::forward<F>(func), args, guards, true);
   }
 }  // namespace ligo
 

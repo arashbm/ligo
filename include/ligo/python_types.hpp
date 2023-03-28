@@ -27,22 +27,26 @@ namespace ligo {
 
     void add_overload_set(const overload_set& set);
     template<typename F, typename ...Guards>
-    void overload_method(const std::string& name, F&& func,
-                         const overload_set::args_tuple<F>& args,
-                         call_gurad<Guards...> guards = call_gurad<Guards...>{});
+    void overload_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_gurad<Guards...> guards = call_gurad<Guards...>{});
     template<typename F, typename ...Guards>
-    void define_method(const std::string& name, F&& func,
-                       const overload_set::args_tuple<F>& args,
-                       call_gurad<Guards...> guards = call_gurad<Guards...>{});
+    void define_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_gurad<Guards...> guards = call_gurad<Guards...>{});
 
     template<typename F, typename ...Guards>
-    void implicit_overload_method(const std::string& name, F&& func,
-                                  const overload_set::args_tuple<F>& args,
-                                  call_gurad<Guards...> guards = call_gurad<Guards...>{});
+    void implicit_overload_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_gurad<Guards...> guards = call_gurad<Guards...>{});
     template<typename F, typename ...Guards>
-    void implicit_define_method(const std::string& name, F&& func,
-                                const overload_set::args_tuple<F>& args,
-                                call_gurad<Guards...> guards = call_gurad<Guards...>{});
+    void implicit_define_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_gurad<Guards...> guards = call_gurad<Guards...>{});
 
     std::string name() const;
     std::string docs() const;

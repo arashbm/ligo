@@ -30,7 +30,7 @@ namespace ligo {
     template<typename T>
     struct argument {
       std::string name;
-      std::optional<T> default_value = {};
+      std::optional<std::decay_t<T>> default_value = {};
       bool convert = true;
     };
 
@@ -63,11 +63,10 @@ namespace ligo {
 
     [[nodiscard]] std::string name() const;
   private:
-    template<typename F>
+    template<typename F, typename ...Guards>
     void _wrap_and_add(
-        F&& func,
-        const std::array<std::string, function_traits<F>::arity>& keywords,
-        bool implicit);
+        F&& func, const args_tuple<F>& args,
+        call_gurad<Guards...> guards, bool implicit);
     std::string _name;
     bool _is_operator;
     std::vector<std::pair<bool, std::function<wrapped_function>>> _overloads;

@@ -16,25 +16,29 @@ namespace ligo {
         std::forward_as_tuple(ptype, _name));
   }
 
-  template<typename F>
-  void python_module::overload_method(const std::string& name, F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords) {
+  template<typename F, typename ...Guards>
+  void python_module::overload_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_gurad<Guards...> guards) {
     auto iter = _methods.find(name);
     if (iter != _methods.end()) {
       iter->second.add_overload(
-        std::forward<F>(func), keywords);
+        std::forward<F>(func), args, guards);
     } else {
       overload_set set(name);
-      set.add_overload(std::forward<F>(func), keywords);
+      set.add_overload(std::forward<F>(func), args, guards);
       _methods.insert({name, set});
     }
   }
 
-  template<typename F>
-  void python_module::define_method(const std::string& name, F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords) {
+  template<typename F, typename ...Guards>
+  void python_module::define_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_gurad<Guards...> guards) {
     overload_set set(name);
-    set.add_overload(std::forward<F>(func), keywords);
+    set.add_overload(std::forward<F>(func), args, guards);
     _methods.insert_or_assign(name, set);
   }
 }  // namespace ligo
