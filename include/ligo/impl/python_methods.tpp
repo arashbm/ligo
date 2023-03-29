@@ -181,10 +181,11 @@ namespace ligo {
     using traits = function_traits<F>;
     auto kw_index = _keyword_indecies(args);
     auto impl = [func, kw_index](
-        PyObject* const* args, std::size_t nargs,
+        PyObject* const* given_args, std::size_t nargs,
         PyObject* kwnames, python_module& mod, bool cast)
           -> std::optional<PyObject*> {
-      auto py_args = _ordered_arguments<F>(args, nargs, kwnames, kw_index);
+      auto py_args = _ordered_arguments<F>(
+          given_args, nargs, kwnames, kw_index);
       if (!py_args)
         return {};
 
