@@ -20,7 +20,7 @@ namespace ligo {
   void python_module::overload_method(
       const std::string& name, F&& func,
       const overload_set::args_tuple<F>& args,
-      call_gurad<Guards...> guards) {
+      call_guard<Guards...> guards) {
     auto iter = _methods.find(name);
     if (iter != _methods.end()) {
       iter->second.add_overload(
@@ -36,7 +36,7 @@ namespace ligo {
   void python_module::define_method(
       const std::string& name, F&& func,
       const overload_set::args_tuple<F>& args,
-      call_gurad<Guards...> guards) {
+      call_guard<Guards...> guards) {
     overload_set set(name);
     set.add_overload(std::forward<F>(func), args, guards);
     _methods.insert_or_assign(name, set);

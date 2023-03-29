@@ -35,10 +35,10 @@ LIGO_MODULE(test_methods_ext, "module for testing methods", mod) {
                     }, {});
   mod.define_method("with_no_gil",
                     [](){ return PyGILState_Check() == 1; }, {},
-                    ligo::call_gurad<ligo::gil_scoped_release>{});
+                    ligo::call_guard<ligo::gil_scoped_release>{});
   mod.define_method("with_no_gil_params",
                     [](PyObject* /* a */){ return PyGILState_Check() == 1; },
-                    {}, ligo::call_gurad<ligo::gil_scoped_release>{});
+                    {}, ligo::call_guard<ligo::gil_scoped_release>{});
   mod.define_method("release_gil",
                     [](){
                       ligo::gil_scoped_release rel{};
@@ -48,5 +48,5 @@ LIGO_MODULE(test_methods_ext, "module for testing methods", mod) {
                     [](){
                       ligo::gil_scoped_acquire acq{};
                       return PyGILState_Check() == 1;
-                    }, {}, ligo::call_gurad<ligo::gil_scoped_release>{});
+                    }, {}, ligo::call_guard<ligo::gil_scoped_release>{});
 }

@@ -14,6 +14,7 @@
 #include "metal.hpp"
 
 #include "utils.hpp"
+#include "gil.hpp"
 #include "abstract_objects.hpp"
 #include "concrete_objects.hpp"
 
@@ -49,11 +50,11 @@ namespace ligo {
 
     template<typename F, typename ...Guards>
     void add_overload(F&& func, const args_tuple<F>& args,
-      call_gurad<Guards...> guards = call_gurad<Guards...>{});
+      call_guard<Guards...> guards = {});
 
     template<typename F, typename ...Guards>
     void add_implicit_overload(F&& func, const args_tuple<F>& args,
-      call_gurad<Guards...> guards = call_gurad<Guards...>{});
+      call_guard<Guards...> guards = {});
 
     PyObject* operator()(PyObject* const* args,
         std::size_t nargs, PyObject* kwnames, python_module& mod);
@@ -66,7 +67,7 @@ namespace ligo {
     template<typename F, typename ...Guards>
     void _wrap_and_add(
         F&& func, const args_tuple<F>& args,
-        call_gurad<Guards...> guards, bool implicit);
+        call_guard<Guards...> guards, bool implicit);
     std::string _name;
     bool _is_operator;
     std::vector<std::pair<bool, std::function<wrapped_function>>> _overloads;

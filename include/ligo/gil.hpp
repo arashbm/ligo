@@ -34,7 +34,7 @@ namespace ligo {
   };
 
   template <typename ...Guards>
-  struct call_gurad {
+  struct call_guard {
     using guards = metal::list<Guards...>;
   };
 }  // namespace ligo

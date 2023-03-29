@@ -10,6 +10,7 @@
 #include <functional>
 #include <typeindex>
 
+#include "gil.hpp"
 #include "python_types.hpp"
 #include "python_methods.hpp"
 
@@ -28,11 +29,11 @@ namespace ligo {
     template<typename F, typename ...Guards>
     void overload_method(const std::string& name, F&& func,
                          const overload_set::args_tuple<F>& args,
-                         call_gurad<Guards...> guards = call_gurad<Guards...>{});
+                         call_guard<Guards...> guards = {});
     template<typename F, typename ...Guards>
     void define_method(const std::string& name, F&& func,
                        const overload_set::args_tuple<F>& args,
-                       call_gurad<Guards...> guards = call_gurad<Guards...>{});
+                       call_guard<Guards...> guards = {});
 
     std::optional<std::reference_wrapper<final_python_type>>
     final_type(const std::type_index& type_idx);

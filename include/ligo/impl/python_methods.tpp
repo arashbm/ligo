@@ -176,7 +176,7 @@ namespace ligo {
   void overload_set::_wrap_and_add(
       F&& func,
       const overload_set::args_tuple<F>& args,
-      call_gurad<Guards...> /* guards */,
+      call_guard<Guards...> /* guards */,
       bool implicit) {
     using traits = function_traits<F>;
     auto kw_index = _keyword_indecies(args);
@@ -228,14 +228,14 @@ namespace ligo {
   template<typename F, typename ...Guards>
   void overload_set::add_overload(
       F&& func, const overload_set::args_tuple<F>& args,
-      call_gurad<Guards...> guards) {
+      call_guard<Guards...> guards) {
     _wrap_and_add(std::forward<F>(func), args, guards, false);
   }
 
   template<typename F, typename ...Guards>
   void overload_set::add_implicit_overload(
       F&& func, const overload_set::args_tuple<F>& args,
-      call_gurad<Guards...> guards) {
+      call_guard<Guards...> guards) {
     if (_name != "__init__")
       throw std::logic_error(
           "methods other than the initiliser cannot be implicit");

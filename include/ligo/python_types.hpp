@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "gil.hpp"
 #include "python_methods.hpp"
 
 namespace ligo {
@@ -30,23 +31,23 @@ namespace ligo {
     void overload_method(
       const std::string& name, F&& func,
       const overload_set::args_tuple<F>& args,
-      call_gurad<Guards...> guards = call_gurad<Guards...>{});
+      call_guard<Guards...> guards = {});
     template<typename F, typename ...Guards>
     void define_method(
       const std::string& name, F&& func,
       const overload_set::args_tuple<F>& args,
-      call_gurad<Guards...> guards = call_gurad<Guards...>{});
+      call_guard<Guards...> guards = {});
 
     template<typename F, typename ...Guards>
     void implicit_overload_method(
       const std::string& name, F&& func,
       const overload_set::args_tuple<F>& args,
-      call_gurad<Guards...> guards = call_gurad<Guards...>{});
+      call_guard<Guards...> guards = {});
     template<typename F, typename ...Guards>
     void implicit_define_method(
       const std::string& name, F&& func,
       const overload_set::args_tuple<F>& args,
-      call_gurad<Guards...> guards = call_gurad<Guards...>{});
+      call_guard<Guards...> guards = {});
 
     std::string name() const;
     std::string docs() const;
