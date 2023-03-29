@@ -30,6 +30,14 @@ LIGO_MODULE(test_methods_ext, "module for testing methods", mod) {
   mod.define_method("fpointer", &test_function, {{"a"}, {"b"}});
   mod.define_method("fpointer_noexcept", &test_function_noexcept, {{"a"}, {"b"}});
 
+  mod.define_method("default_arg",
+                    [](bool arg){
+                      if (arg)
+                        Py_RETURN_TRUE;
+                      else 
+                        Py_RETURN_FALSE;
+                    }, {{"a", true}});
+
   mod.define_method("gil_default", [](){
                       return PyGILState_Check() == 1;
                     }, {});

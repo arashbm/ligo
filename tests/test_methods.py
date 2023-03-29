@@ -23,6 +23,12 @@ def test_function_pointer():
     assert test_methods_ext.fpointer_noexcept(12, 12)
 
 
+def test_default_arg():
+    assert not test_methods_ext.default_arg(False)
+    assert test_methods_ext.default_arg(True)
+    assert test_methods_ext.default_arg()
+
+
 def test_gil_default():
     assert test_methods_ext.gil_default()
 
