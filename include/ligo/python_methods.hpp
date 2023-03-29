@@ -35,16 +35,17 @@ namespace ligo {
       bool convert = true;
     };
 
-    template<typename F, typename ...Guards>
-    struct method_properties {
-    };
-
     template<typename F>
     using args_tuple = metal::apply<metal::lambda<std::tuple>,
       metal::transform<metal::lambda<argument>, typename function_traits<F>::args>>;
 
     using wrapped_function = std::optional<PyObject*>(
         PyObject* const*, std::size_t, PyObject*, python_module&, bool);
+
+    struct overload {
+      bool implicit;
+      std::function<wrapped_function> func;
+    };
 
     explicit overload_set(const std::string& name);
 
@@ -70,7 +71,7 @@ namespace ligo {
         call_guard<Guards...> guards, bool implicit);
     std::string _name;
     bool _is_operator;
-    std::vector<std::pair<bool, std::function<wrapped_function>>> _overloads;
+    std::vector<overload> _overloads;
   };
 
   struct method_descriptor {

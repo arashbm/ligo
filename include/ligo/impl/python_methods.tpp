@@ -6,6 +6,7 @@
 #include <optional>
 #include <bit>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -136,11 +137,38 @@ namespace ligo {
     return _keyword_indecies_impl(args, std::index_sequence_for<Args...>());
   }
 
+
+  template <typename ...Args, std::size_t ...Is>
+  std::size_t _mandatory_args_impl(
+      const std::tuple<Args...>& args,
+      std::index_sequence<Is...> /* is */) {
+    std::size_t result = sizeof...(Is); 
+    bool found = false;
+    auto check_pred = [&]<std::size_t idx>(){
+      if (!found && std::get<idx>(args).default_value) {
+        result = idx;
+        found = true;
+      } else if (found && !std::get<idx>(args).default_value) {
+        throw std::logic_error("non-default argument follows default argument");
+      }
+    };
+
+    (check_pred.template operator()<Is>(), ...);
+
+    return result;
+  }
+  
+  template <typename ...Args>
+  std::size_t _mandatory_args(const std::tuple<Args...>& args) {
+    return _mandatory_args_impl(args, std::index_sequence_for<Args...>{});
+  }
+
   template<typename F>
   std::optional<std::array<PyObject*, function_traits<F>::arity>>
   _ordered_arguments(
     PyObject* const* args, std::size_t nargs, PyObject* kwnames,
-    const std::unordered_map<std::string, std::size_t>& kw_index) {
+    const std::unordered_map<std::string, std::size_t>& kw_index,
+    std::size_t mandatory_args) {
     std::size_t positional_args_len = PyVectorcall_NARGS(nargs);
     std::size_t total_args_len = positional_args_len;
     std::size_t kw_length = 0;
@@ -149,7 +177,7 @@ namespace ligo {
       kw_length = static_cast<std::size_t>(PyObject_Length(kwnames));
     total_args_len += kw_length;
 
-    if (total_args_len != function_traits<F>::arity)
+    if (total_args_len < mandatory_args || total_args_len > function_traits<F>::arity)
       return {};
 
     std::array<PyObject*, function_traits<F>::arity> py_args{};
@@ -180,12 +208,13 @@ namespace ligo {
       bool implicit) {
     using traits = function_traits<F>;
     auto kw_index = _keyword_indecies(args);
-    auto impl = [func, kw_index](
+    std::size_t mandatory_args = _mandatory_args(args);
+    auto impl = [func, kw_index, mandatory_args, args](
         PyObject* const* given_args, std::size_t nargs,
         PyObject* kwnames, python_module& mod, bool cast)
           -> std::optional<PyObject*> {
       auto py_args = _ordered_arguments<F>(
-          given_args, nargs, kwnames, kw_index);
+          given_args, nargs, kwnames, kw_index, mandatory_args);
       if (!py_args)
         return {};
 
@@ -223,7 +252,7 @@ namespace ligo {
       }
     };
 
-    _overloads.emplace_back(implicit, impl);
+    _overloads.push_back({implicit, impl});
   }
 
   template<typename F, typename ...Guards>
