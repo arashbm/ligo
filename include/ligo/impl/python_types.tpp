@@ -18,50 +18,58 @@ namespace ligo {
   }
 
   template <typename T>
-  template<typename F>
-  void python_type<T>::overload_method(const std::string& name, F&& func,
-    const std::array<std::string, function_traits<F>::arity>& keywords) {
+  template<typename F, typename ...Guards>
+  void python_type<T>::overload_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_guard<Guards...> guards) {
     auto iter = _overload_sets.find(name);
     if (iter != _overload_sets.end()) {
       iter->second.add_overload(
-        std::forward<F>(func), keywords);
+        std::forward<F>(func), args, guards);
     } else {
       overload_set set(name);
-      set.add_overload(std::forward<F>(func), keywords);
+      set.add_overload(std::forward<F>(func), args, guards);
       _overload_sets.insert({name, set});
     }
   }
 
   template <typename T>
-  template<typename F>
-  void python_type<T>::implicit_overload_method(const std::string& name, F&& func,
-    const std::array<std::string, function_traits<F>::arity>& keywords) {
+  template<typename F, typename ...Guards>
+  void python_type<T>::implicit_overload_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_guard<Guards...> guards) {
     auto iter = _overload_sets.find(name);
     if (iter != _overload_sets.end()) {
       iter->second.add_implicit_overload(
-        std::forward<F>(func), keywords);
+        std::forward<F>(func), args, guards);
     } else {
       overload_set set(name);
-      set.add_implicit_overload(std::forward<F>(func), keywords);
+      set.add_implicit_overload(std::forward<F>(func), args, guards);
       _overload_sets.insert({name, set});
     }
   }
 
   template <typename T>
-  template<typename F>
-  void python_type<T>::define_method(const std::string& name, F&& func,
-    const std::array<std::string, function_traits<F>::arity>& keywords) {
+  template<typename F, typename ...Guards>
+  void python_type<T>::define_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_guard<Guards...> guards) {
     overload_set set(name);
-    set.add_overload(std::forward<F>(func), keywords);
+    set.add_overload(std::forward<F>(func), args, guards);
     _overload_sets.insert_or_assign(name, set);
   }
 
   template <typename T>
-  template<typename F>
-  void python_type<T>::implicit_define_method(const std::string& name, F&& func,
-    const std::array<std::string, function_traits<F>::arity>& keywords) {
+  template<typename F, typename ...Guards>
+  void python_type<T>::implicit_define_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_guard<Guards...> guards) {
     overload_set set(name);
-    set.add_implicit_overload(std::forward<F>(func), keywords);
+    set.add_implicit_overload(std::forward<F>(func), args, guards);
     _overload_sets.insert_or_assign(name, set);
   }
 

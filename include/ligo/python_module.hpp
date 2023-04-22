@@ -10,7 +10,9 @@
 #include <functional>
 #include <typeindex>
 
+#include "gil.hpp"
 #include "python_types.hpp"
+#include "python_methods.hpp"
 
 namespace ligo {
   class overload_set;
@@ -24,12 +26,14 @@ namespace ligo {
     void add_type(const python_type<T>& ptype);
 
     void add_overload_set(const overload_set& set);
-    template<typename F>
+    template<typename F, typename ...Guards>
     void overload_method(const std::string& name, F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
-    template<typename F>
+                         const overload_set::args_tuple<F>& args,
+                         call_guard<Guards...> guards = {});
+    template<typename F, typename ...Guards>
     void define_method(const std::string& name, F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
+                       const overload_set::args_tuple<F>& args,
+                       call_guard<Guards...> guards = {});
 
     std::optional<std::reference_wrapper<final_python_type>>
     final_type(const std::type_index& type_idx);

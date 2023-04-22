@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "gil.hpp"
 #include "python_methods.hpp"
 
 namespace ligo {
@@ -26,19 +27,27 @@ namespace ligo {
     python_type(const std::string& name, const std::string& docs);
 
     void add_overload_set(const overload_set& set);
-    template<typename F>
-    void overload_method(const std::string& name, F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
-    template<typename F>
-    void define_method(const std::string& name, F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
+    template<typename F, typename ...Guards>
+    void overload_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_guard<Guards...> guards = {});
+    template<typename F, typename ...Guards>
+    void define_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_guard<Guards...> guards = {});
 
-    template<typename F>
-    void implicit_overload_method(const std::string& name, F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
-    template<typename F>
-    void implicit_define_method(const std::string& name, F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
+    template<typename F, typename ...Guards>
+    void implicit_overload_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_guard<Guards...> guards = {});
+    template<typename F, typename ...Guards>
+    void implicit_define_method(
+      const std::string& name, F&& func,
+      const overload_set::args_tuple<F>& args,
+      call_guard<Guards...> guards = {});
 
     std::string name() const;
     std::string docs() const;

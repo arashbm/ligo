@@ -1,6 +1,7 @@
 #ifndef INCLUDE_LIGO_PYTHON_METHODS_HPP_
 #define INCLUDE_LIGO_PYTHON_METHODS_HPP_
 
+#include "ligo/gil.hpp"
 #include "python.hpp"
 
 #include <concepts>
@@ -13,6 +14,7 @@
 #include "metal.hpp"
 
 #include "utils.hpp"
+#include "gil.hpp"
 #include "abstract_objects.hpp"
 #include "concrete_objects.hpp"
 
@@ -26,18 +28,34 @@ namespace ligo {
 
   class overload_set {
   public:
+    template<typename T>
+    struct argument {
+      std::string name;
+      std::optional<std::remove_cvref_t<T>> default_value = {};
+      bool convert = true;
+    };
+
+    template<typename F>
+    using args_tuple = metal::apply<metal::lambda<std::tuple>,
+      metal::transform<metal::lambda<argument>, typename function_traits<F>::args>>;
+
     using wrapped_function = std::optional<PyObject*>(
         PyObject* const*, std::size_t, PyObject*, python_module&, bool);
 
+    struct overload {
+      bool implicit;
+      std::function<wrapped_function> func;
+    };
+
     explicit overload_set(const std::string& name);
 
-    template<typename F>
-    void add_overload(F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
+    template<typename F, typename ...Guards>
+    void add_overload(F&& func, const args_tuple<F>& args,
+      call_guard<Guards...> guards = {});
 
-    template<typename F>
-    void add_implicit_overload(F&& func,
-      const std::array<std::string, function_traits<F>::arity>& keywords);
+    template<typename F, typename ...Guards>
+    void add_implicit_overload(F&& func, const args_tuple<F>& args,
+      call_guard<Guards...> guards = {});
 
     PyObject* operator()(PyObject* const* args,
         std::size_t nargs, PyObject* kwnames, python_module& mod);
@@ -47,14 +65,13 @@ namespace ligo {
 
     [[nodiscard]] std::string name() const;
   private:
-    template<typename F>
+    template<typename F, typename ...Guards>
     void _wrap_and_add(
-        F&& func,
-        const std::array<std::string, function_traits<F>::arity>& keywords,
-        bool implicit);
+        F&& func, const args_tuple<F>& args,
+        call_guard<Guards...> guards, bool implicit);
     std::string _name;
     bool _is_operator;
-    std::vector<std::pair<bool, std::function<wrapped_function>>> _overloads;
+    std::vector<overload> _overloads;
   };
 
   struct method_descriptor {
