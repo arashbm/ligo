@@ -38,6 +38,14 @@ LIGO_MODULE(test_methods_ext, "module for testing methods", mod) {
                         Py_RETURN_FALSE;
                     }, {{"a", true}});
 
+  mod.define_method("some_default_arg",
+                    [](bool, bool arg){
+                      if (arg)
+                        Py_RETURN_TRUE;
+                      else 
+                        Py_RETURN_FALSE;
+                    }, {{"ignored"}, {"a", true}});
+
   mod.define_method("gil_default", [](){
                       return PyGILState_Check() == 1;
                     }, {});

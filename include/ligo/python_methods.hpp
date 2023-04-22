@@ -31,7 +31,7 @@ namespace ligo {
     template<typename T>
     struct argument {
       std::string name;
-      std::optional<std::decay_t<T>> default_value = {};
+      std::optional<std::remove_cvref_t<T>> default_value = {};
       bool convert = true;
     };
 

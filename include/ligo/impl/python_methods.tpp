@@ -1,6 +1,8 @@
 #ifndef INCLUDE_LIGO_IMPL_PYTHON_METHODS_TPP_
 #define INCLUDE_LIGO_IMPL_PYTHON_METHODS_TPP_
 
+#include <iostream>
+
 #include <cstddef>
 #include <iterator>
 #include <optional>
@@ -82,41 +84,50 @@ namespace ligo {
     PyObject* _obj;
   };
 
-  template <typename ...Args, std::size_t ...Ns>
-  std::optional<std::tuple<Args...>>
+  template <typename ...ArgTypes, typename ...ArgDefs, std::size_t ...Ns>
+  std::optional<std::tuple<ArgTypes...>>
   unwrap_args_impl(
-      const std::array<PyObject*, sizeof...(Args)>& args_array,
+      const std::array<PyObject*, sizeof...(ArgTypes)>& args_array,
       python_module& mod, bool cast, temporary_list& tmp_list,
+      const std::tuple<ArgDefs...>& arg_defs,
       std::index_sequence<Ns...> /* is */) {
-    if (cast) {
-      std::tuple args_tpl(
-          handle<std::remove_cvref_t<Args>>::from_python_with_casting(
-            std::get<Ns>(args_array), mod, tmp_list)...);
-      if ((std::get<Ns>(args_tpl) && ...))
-        return {{static_cast<Args>(std::get<Ns>(args_tpl).value())...}};
-    } else {
-      std::tuple args_tpl(
-          handle<std::remove_cvref_t<Args>>::from_python(
-            std::get<Ns>(args_array), mod)...);
-      if ((std::get<Ns>(args_tpl) && ...))
-        return {{static_cast<Args>(std::get<Ns>(args_tpl).value())...}};
-    }
+
+    auto get_arg = [&]<std::size_t idx, typename ArgType>()
+        -> std::optional<handle<std::remove_cvref_t<ArgType>>>{
+      auto arg_definition = std::get<idx>(arg_defs);
+      auto arg = std::get<idx>(args_array);
+      if (arg != nullptr && cast && arg_definition.convert)
+        return handle<std::remove_cvref_t<ArgType>>::from_python_with_casting(
+          arg, mod, tmp_list);
+      else if (arg != nullptr)
+        return handle<std::remove_cvref_t<ArgType>>::from_python(arg, mod);
+      else if (arg == nullptr && arg_definition.default_value.has_value())
+        return handle<std::remove_cvref_t<ArgType>>::from_cpp(
+            arg_definition.default_value.value(), mod);
+      else
+        return {};
+    };
+
+    std::tuple args_tpl(get_arg.template operator()<Ns, ArgTypes>()...);
+    if ((std::get<Ns>(args_tpl) && ...))
+      return {{static_cast<ArgTypes>(std::get<Ns>(args_tpl).value())...}};
 
     return {};
   };
 
-  template <typename T>
+  template <typename T1, typename T2>
   struct unwrap_args;
 
-  template <typename ...Args>
-  struct unwrap_args<metal::list<Args...>> {
+  template <typename ...ArgTypes, typename ...ArgDefs>
+  struct unwrap_args<metal::list<ArgTypes...>, std::tuple<ArgDefs...>> {
     auto operator()(
-        const std::array<PyObject*, sizeof...(Args)>& args_array,
+        const std::array<PyObject*, sizeof...(ArgTypes)>& args_array,
         python_module& mod,
-        bool cast, temporary_list& tmp_list) {
-      return unwrap_args_impl<Args...>(
-          args_array, mod, cast, tmp_list,
-          std::index_sequence_for<Args...>{});
+        bool cast, temporary_list& tmp_list,
+        const std::tuple<ArgDefs...>& arg_defs) {
+      return unwrap_args_impl<ArgTypes...>(
+          args_array, mod, cast, tmp_list, arg_defs,
+          std::index_sequence_for<ArgTypes...>{});
     }
   };
 
@@ -219,8 +230,9 @@ namespace ligo {
         return {};
 
       temporary_list tmp_list;
-      auto t_args = unwrap_args<typename traits::args>{}(
-          *py_args, mod, cast, tmp_list);
+      auto t_args = unwrap_args<
+        typename traits::args, overload_set::args_tuple<F>>{}(
+          *py_args, mod, cast, tmp_list, args);
       if (!t_args)
         return {};
 

@@ -29,6 +29,12 @@ def test_default_arg():
     assert test_methods_ext.default_arg()
 
 
+def test_mixing_mandatory_and_default_arg():
+    assert not test_methods_ext.some_default_arg(False, False)
+    assert test_methods_ext.some_default_arg(False, True)
+    assert test_methods_ext.some_default_arg(False)
+
+
 def test_gil_default():
     assert test_methods_ext.gil_default()
 
